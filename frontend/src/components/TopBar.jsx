@@ -11,7 +11,7 @@ function TopBar()
   }, []);
 
   return (
-    <div className="w-full bg-gray-800 text-white flex justify-between items-center px-4 py-2">
+    <div className="z-10 w-full h-10 bg-gray-800 text-white flex justify-between items-center px-4 py-2 sticky top-0">
       <div>
         {time.toLocaleTimeString()}
       </div>
