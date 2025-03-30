@@ -1,5 +1,4 @@
 import React from 'react';
-import { toast } from 'react-hot-toast';
 import { ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router-dom';
 

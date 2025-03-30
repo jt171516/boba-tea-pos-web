@@ -3,12 +3,12 @@ import PropTypes from 'prop-types'
 
 export default function ItemCard({ item }) {
   return (
-    <div className="card w-96 h-96 bg-base-300 m-4 transition duration-300 ease-in-out hover: hover:scale-105">
+    <div className="card z-0 w-80 h-80 bg-base-300 m-4 transition duration-300 ease-in-out hover: hover:scale-105">
       <figure>
         <img
           src={item.image}
           alt={item.name}
-          className="w-full h-full object-cover rounded-t-lg"
+          className="w-full h-60 object-cover rounded-t-lg"
         />
       </figure>
       <div className="card-body items-center text-center">
