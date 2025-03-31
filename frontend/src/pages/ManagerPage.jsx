@@ -15,10 +15,7 @@ const ManagerPage = () => {
     <div className="flex flex-col h-screen">
       {isLoggedIn ? (
         <>
-          <div className="w-full">
-            <TopBar />
-          </div>
-
+          <TopBar />
           <div className="flex flex-grow">
             <ManagerSideMenu />
 
