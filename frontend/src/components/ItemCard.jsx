@@ -1,9 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-export default function ItemCard({ item }) {
+export default function ItemCard({ item, onClick }) {
   return (
-    <div className="card z-0 w-80 h-80 bg-base-300 m-4 transition duration-300 ease-in-out hover: hover:scale-105">
+    <div className="card z-0 w-80 h-80 bg-base-300 m-4 transition duration-300 ease-in-out hover: hover:scale-105"
+    onClick={onClick}>
       <figure>
         <img
           src={item.image}
