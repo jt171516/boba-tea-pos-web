@@ -18,10 +18,18 @@ const pool = new Pool({
 });
 
 const app = express();
-const PORT = 5000;
+const PORT = 5001;
+
+// Configure CORS
+const corsOptions = {
+    origin: "http://localhost:5173", 
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"], 
+  };
+  
 
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(helmet()); //security middleware to provide HTTPS headers
 app.use(morgan("dev")); //log all requests
 
@@ -38,6 +46,17 @@ app.get("/item", async (req, res) => {
     } catch (error) {
         console.error("Error fetching items:", error);
         res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+app.get("/api/inventory", async (req, res) => {
+    try {
+        const result = await pool.query("SELECT * FROM inventory");
+        console.log("Fetched inventory data:", result.rows); // Debugging log
+        res.json(result.rows);
+    } catch (error) {
+        console.error("Error fetching inventory data:", error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 });
 
