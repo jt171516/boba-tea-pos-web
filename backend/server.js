@@ -18,7 +18,7 @@ const pool = new Pool({
 });
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PSQL_PORT;
 
 app.use(express.json());
 app.use(cors());

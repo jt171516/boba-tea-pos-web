@@ -7,6 +7,8 @@ import FoodMenu from './pages/FoodMenu';
 import CustomerPage from './pages/CustomerPage';
 import ManagerPage from './pages/ManagerPage';
 import WorkerPage from './pages/WorkerPage';
+import ManagerDashboard from './pages/ManagerDashboard';
+
 
 function App() {
   return (
@@ -16,6 +18,7 @@ function App() {
         <Route path="/menu" element={<FoodMenu />} />
         <Route path="/customer/:category?" element={<CustomerPage />} />
         <Route path="/manager" element={<ManagerPage />} /> 
+        <Route path="/manager/dashboard" element={<ManagerDashboard />} />
         <Route path="/worker" element={<WorkerPage />} />  
       </Routes>
     </div>
