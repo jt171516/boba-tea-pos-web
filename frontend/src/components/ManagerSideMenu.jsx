@@ -19,6 +19,12 @@ function ManagerSideMenu() {
         >
           Inventory
         </Link>
+        <Link
+          to="/manager/employees"
+          className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-700 transition duration-200 ease-in-out"
+        >
+          Employees
+        </Link>
       </nav>
     </div>
   );
