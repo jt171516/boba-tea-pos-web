@@ -39,7 +39,7 @@ app.get("/", (req,res) => {
     res.send("Hello from the backend");
 })
 
-app.get("/item", async (req, res) => {
+app.get("/api/item", async (req, res) => {
     try {
         const result = await pool.query("SELECT * FROM item");
         res.json(result.rows);
