@@ -8,7 +8,7 @@ const InventoryPage = () => {
   useEffect(() => {
     const fetchInventory = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/inventory");
+        const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/inventory`);
         if (!response.ok) {
           throw new Error("Failed to fetch inventory data");
         }
