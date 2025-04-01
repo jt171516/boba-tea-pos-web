@@ -15,7 +15,7 @@ function CustomerPage() {
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await fetch('http://localhost:5001/item');
+        const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/item`);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
