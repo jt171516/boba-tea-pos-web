@@ -49,7 +49,7 @@ app.get("/item", async (req, res) => {
     }
 });
 
-app.get("/api/inventory", async (req, res) => {
+app.get("/inventory", async (req, res) => {
     try {
         const result = await pool.query("SELECT * FROM inventory");
         console.log("Fetched inventory data:", result.rows); // Debugging log
