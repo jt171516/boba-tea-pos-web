@@ -8,7 +8,7 @@ const ManagerInventoryPage = () => {
   useEffect(() => {
     const fetchInventory = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/inventory");
+        const response = await fetch("http://localhost:5001/inventory");
         if (!response.ok) {
           throw new Error("Failed to fetch inventory data");
         }

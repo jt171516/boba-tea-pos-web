@@ -5,11 +5,13 @@ import { Toaster } from 'react-hot-toast';
 import HomePage from './pages/HomePage';
 import FoodMenu from './pages/FoodMenu';
 import CustomerPage from './pages/CustomerPage';
+
 import ManagerPage from './pages/ManagerPage';
 import ManagerMenuPage from "./pages/ManagerMenuPage"
 import ManagerSalesPage from "./pages/ManagerSalesPage";
 import ManagerInventoryPage from "./pages/ManagerInventoryPage";
 import ManagerEmployeesPage from "./pages/ManagerEmployeesPage";
+
 import WorkerPage from './pages/WorkerPage';
 
 
