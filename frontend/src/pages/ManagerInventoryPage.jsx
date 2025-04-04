@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const InventoryPage = () => {
+const ManagerInventoryPage = () => {
   const [inventory, setInventory] = useState([]);
   const [searchQuery, setSearchQuery] = useState(""); 
   const [filteredInventory, setFilteredInventory] = useState([]); 
@@ -73,4 +73,4 @@ const InventoryPage = () => {
   );
 };
 
-export default InventoryPage;
+export default ManagerInventoryPage;

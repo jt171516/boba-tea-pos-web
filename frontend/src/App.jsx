@@ -6,10 +6,11 @@ import HomePage from './pages/HomePage';
 import FoodMenu from './pages/FoodMenu';
 import CustomerPage from './pages/CustomerPage';
 import ManagerPage from './pages/ManagerPage';
+import ManagerMenuPage from "./pages/ManagerMenuPage"
+import ManagerSalesPage from "./pages/ManagerSalesPage";
+import ManagerInventoryPage from "./pages/ManagerInventoryPage";
+import ManagerEmployeesPage from "./pages/ManagerEmployeesPage";
 import WorkerPage from './pages/WorkerPage';
-import SalesPage from "./pages/SalesPage";
-import InventoryPage from "./pages/InventoryPage";
-import EmployeesPage from "./pages/EmployeesPage";
 
 
 function App() {
@@ -21,9 +22,10 @@ function App() {
         <Route path="/customer/:category?" element={<CustomerPage />} />
 
         <Route path="/manager" element={<ManagerPage />}>
-          <Route path="sales" element={<SalesPage />} />
-          <Route path="inventory" element={<InventoryPage />} />
-          <Route path="employees" element={<EmployeesPage />} />
+          <Route path="sales" element={<ManagerSalesPage />} />
+          <Route path="menu" element={<ManagerMenuPage />}/>
+          <Route path="inventory" element={<ManagerInventoryPage />} />
+          <Route path="employees" element={<ManagerEmployeesPage />} />
         </Route>
 
         <Route path="/worker" element={<WorkerPage />} />  

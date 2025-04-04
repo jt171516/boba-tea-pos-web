@@ -1,6 +1,6 @@
 import React from "react";
 
-const EmployeesPage = () => {
+const ManagerEmployeesPage = () => {
   return (
     <div>
       <h1 className="text-3xl font-bold">Employee Management</h1>
@@ -9,4 +9,4 @@ const EmployeesPage = () => {
   );
 };
 
-export default EmployeesPage;
+export default ManagerEmployeesPage;

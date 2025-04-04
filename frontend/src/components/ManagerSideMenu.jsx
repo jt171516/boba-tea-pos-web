@@ -8,10 +8,22 @@ function ManagerSideMenu() {
       <h2 className="text-xl font-bold mb-6 border-b border-gray-700 pb-2">Manager Panel</h2>
       <nav className="flex flex-col gap-3">
         <Link
+          to="/manager/"
+          className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-700 transition duration-200 ease-in-out"
+        >
+          Overview
+        </Link>
+        <Link
           to="/manager/sales"
           className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-700 transition duration-200 ease-in-out"
         >
           Sales
+        </Link>
+        <Link
+          to="/manager/menu"
+          className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-700 transition duration-200 ease-in-out"
+        >
+          Menu
         </Link>
         <Link
           to="/manager/inventory"
