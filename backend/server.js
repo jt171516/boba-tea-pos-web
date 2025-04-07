@@ -22,7 +22,7 @@ const PORT = 5001;
 
 // Configure CORS
 const corsOptions = {
-    origin: "http://localhost:5173", 
+    origin: process.env.NODE_ENV === "production" ? process.env.FRONTEND_URL : "http://localhost:5173", 
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"], 
   };
@@ -39,7 +39,7 @@ app.get("/", (req,res) => {
     res.send("Hello from the backend");
 })
 
-app.get("/item", async (req, res) => {
+app.get("/api/item", async (req, res) => {
     try {
         const result = await pool.query("SELECT * FROM item");
         res.json(result.rows);
@@ -49,7 +49,7 @@ app.get("/item", async (req, res) => {
     }
 });
 
-app.get("/inventory", async (req, res) => {
+app.get("/api/inventory", async (req, res) => {
     try {
         const result = await pool.query("SELECT * FROM inventory");
         console.log("Fetched inventory data:", result.rows); // Debugging log
