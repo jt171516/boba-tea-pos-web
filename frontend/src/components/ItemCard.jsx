@@ -26,6 +26,7 @@ ItemCard.propTypes = {
     name: PropTypes.string.isRequired,
     price: PropTypes.number.isRequired,
     calories: PropTypes.number.isRequired,
-    image: PropTypes.string.isRequired
+    image: PropTypes.string.isRequired,
   }).isRequired,
+  onClick: PropTypes.func.isRequired,
 };
