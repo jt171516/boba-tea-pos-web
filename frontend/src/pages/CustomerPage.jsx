@@ -75,7 +75,7 @@ function CustomerPage() {
           </div>
         </div>
       </div>
-      {selectedItem && (
+      {isPopUpOpen && (
             <ItemPopUp
             isOpen={isPopUpOpen}
             onClose={() => setIsPopUpOpen(false)}
