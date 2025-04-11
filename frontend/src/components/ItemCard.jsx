@@ -1,5 +1,4 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 
 export default function ItemCard({ item, onClick }) {
   return (
@@ -20,13 +19,3 @@ export default function ItemCard({ item, onClick }) {
     </div>
   )
 }
-
-ItemCard.propTypes = {
-  item: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    price: PropTypes.number.isRequired,
-    calories: PropTypes.number.isRequired,
-    image: PropTypes.string.isRequired,
-  }).isRequired,
-  onClick: PropTypes.func.isRequired,
-};
