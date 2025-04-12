@@ -6,6 +6,7 @@ import SideMenu from '../components/SideMenu';
 import ItemPopUp from '../components/ItemPopUp';
 import { Toaster } from 'react-hot-toast';
 
+// Format the category names
 function format(str) {
   if (!str) return '';
   return str.replace(/-/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
@@ -18,6 +19,7 @@ function CustomerPage() {
   const [isPopUpOpen, setIsPopUpOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null); //state to keep track of the selected item
 
+  // Fetch items from database
   useEffect(() => {
     const fetchItems = async () => {
       try {
@@ -27,6 +29,7 @@ function CustomerPage() {
         }
         const data = await response.json();
 
+        // Sort items by ID
         const sortedData = data.sort((a, b) => a.id - b.id);
         setItems(sortedData);
       } catch (error) {
@@ -37,6 +40,7 @@ function CustomerPage() {
     fetchItems();
   }, []);
 
+  // Filter items based on category and search
   const filteredItems = items.filter((item) => {
     const inCategory = !category || category === 'all-drinks' || item.category.toLowerCase() === category.toLowerCase();
     const inSearchQuery = item.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -56,9 +60,13 @@ function CustomerPage() {
       <div className="flex flex-grow">
         <SideMenu />
         <div className="flex flex-col flex-grow bg-base-100 p-4">
+
+          {/* Show current drinks category */}
           <h1 className="text-4xl font-bold mb-6 text-center">
             {category && category.toLowerCase() !== 'all-drinks' ? `${format(category)} Menu` : 'Menu'}
           </h1>
+
+          {/* Search for drinks */}
           <div className="mb-4 mx-4">
             <input
               type="text"
@@ -68,6 +76,8 @@ function CustomerPage() {
               className="border border-gray-300 rounded-lg px-4 py-2 w-full"
             />
           </div>
+
+          {/* Display filtered drinks using ItemCard */}
           <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 justify-center mx-auto">
             {filteredItems.map((item) => (
               <ItemCard key={item.id} item={item} onClick={() => handleItemClick(item)}/>
