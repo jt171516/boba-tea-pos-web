@@ -8,13 +8,19 @@ export default function ItemCard({ item, onClick }) {
         <img
           src={item.image}
           alt={item.name}
-          className="w-full h-60 object-cover rounded-t-lg"
+          className="w-full h-40 object-cover rounded-t-lg"
         />
       </figure>
       <div className="card-body items-center text-center">
         <h2 className="card-title">{item.name}</h2>
         <p>{item.calories} Cal.</p>
         <p>${item.price.toFixed(2)}</p>
+        <div className="flex flex-wrap justify-center gap-2">
+          {item.vegetarian && (<span className="badge badge-success">{item.vegetarian}</span>)}
+          {item.allergen && item.allergen.map((allergen, index) => (
+            <span key={index} className="badge badge-warning">{allergen}</span>
+          ))}
+        </div>
       </div>
     </div>
   )
