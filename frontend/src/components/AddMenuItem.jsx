@@ -8,6 +8,8 @@ const AddMenuItem = ({ isOpen, onClose, onAdd, initialData }) => {
     calories: "",
     price: "",
     sales: "",
+    vegetarian: false, // New field for Vegetarian
+    allergens: "", // New field for Allergens
   });
 
   // Populate form fields when initialData is provided
@@ -15,13 +17,25 @@ const AddMenuItem = ({ isOpen, onClose, onAdd, initialData }) => {
     if (initialData) {
       setFormData(initialData); // Pre-fill the form with initial data
     } else {
-      setFormData({ id: "", name: "", category: "", calories: "", price: "", sales: "" });
+      setFormData({
+        id: "",
+        name: "",
+        category: "",
+        calories: "",
+        price: "",
+        sales: "",
+        vegetarian: false,
+        allergens: "",
+      });
     }
   }, [initialData]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    const { name, value, type, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value, // Handle checkbox for vegetarian
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -134,6 +148,27 @@ const AddMenuItem = ({ isOpen, onClose, onAdd, initialData }) => {
               onChange={handleChange}
               className="input input-bordered w-full"
               required
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block mb-2">Vegetarian</label>
+            <input
+              type="checkbox"
+              name="vegetarian"
+              checked={formData.vegetarian}
+              onChange={handleChange}
+              className="checkbox"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block mb-2">Allergens</label>
+            <input
+              type="text"
+              name="allergens"
+              value={formData.allergens}
+              onChange={handleChange}
+              className="input input-bordered w-full"
+              placeholder="Enter allergens (comma-separated)"
             />
           </div>
           <div className="flex justify-end gap-4">

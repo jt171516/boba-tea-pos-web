@@ -110,6 +110,8 @@ const ManagerMenuPage = () => {
             <th className="border border-gray-300 px-4 py-2">Calories</th>
             <th className="border border-gray-300 px-4 py-2">Price</th>
             <th className="border border-gray-300 px-4 py-2">Sales</th>
+            <th className="border border-gray-300 px-4 py-2">Vegetarian</th>
+            <th className="border border-gray-300 px-4 py-2">Allergens</th>
             <th className="border border-gray-300 px-4 py-2">Actions</th>
           </tr>
         </thead>
@@ -122,6 +124,10 @@ const ManagerMenuPage = () => {
               <td className="border border-gray-300 px-4 py-2">{item.calories}</td>
               <td className="border border-gray-300 px-4 py-2">{item.price}</td>
               <td className="border border-gray-300 px-4 py-2">{item.sales}</td>
+              <td className="border border-gray-300 px-4 py-2">
+                {item.vegetarian ? "Yes" : "No"}
+              </td>
+              <td className="border border-gray-300 px-4 py-2">{item.allergens}</td>
               <td className="border border-gray-300 px-4 py-2 text-center">
                 <button
                   onClick={() => handleEditItem(item)}
