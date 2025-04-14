@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const AddMenuItem = ({ isOpen, onClose, onAdd }) => {
+const AddMenuItem = ({ isOpen, onClose, onAdd, initialData }) => {
   const [formData, setFormData] = useState({
     id: "",
     name: "",
@@ -10,6 +10,15 @@ const AddMenuItem = ({ isOpen, onClose, onAdd }) => {
     sales: "",
   });
 
+  // Populate form fields when initialData is provided
+  useEffect(() => {
+    if (initialData) {
+      setFormData(initialData); // Pre-fill the form with initial data
+    } else {
+      setFormData({ id: "", name: "", category: "", calories: "", price: "", sales: "" });
+    }
+  }, [initialData]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -18,43 +27,30 @@ const AddMenuItem = ({ isOpen, onClose, onAdd }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Convert id, price, calories, and sales to integers
-    const formattedData = {
-      ...formData,
-      id: parseInt(formData.id, 10),
-      price: parseInt(formData.price, 10),
-      calories: parseInt(formData.calories, 10),
-      sales: parseInt(formData.sales, 10),
-    };
-
-    console.log("Submitting form data:", formattedData); // Log the form data
-
     try {
-      const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/item`, {
-        method: "POST",
+      const method = initialData ? "PUT" : "POST";
+      const url = initialData
+        ? `${import.meta.env.VITE_APP_API_URL}/item/${formData.id}`
+        : `${import.meta.env.VITE_APP_API_URL}/item`;
+
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formattedData),
+        body: JSON.stringify(formData),
       });
 
-      console.log("Response status:", response.status); // Log the response status
-
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Response error:", errorText); // Log the response error
-        console.log("POST URL:", `${import.meta.env.VITE_APP_API_URL}/api/item`);
-        throw new Error("Failed to add item to the database");
+        throw new Error("Failed to save item");
       }
 
-      const newItem = await response.json();
-      console.log("New item added:", newItem); // Log the added item
-      onAdd(newItem);
-      setFormData({ id: "", name: "", category: "", calories: "", price: "", sales: "" });
-      onClose();
+      const savedItem = await response.json();
+      onAdd(savedItem); // Pass the saved item to the parent component
+      onClose(); // Close the modal
     } catch (error) {
-      console.error("Error adding item:", error);
-      alert("Failed to add item. Please try again.");
+      console.error("Error saving item:", error);
+      alert("Failed to save item. Please try again.");
     }
   };
 
@@ -63,7 +59,7 @@ const AddMenuItem = ({ isOpen, onClose, onAdd }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-base-100 p-6 rounded-lg shadow-lg w-96">
-        <h2 className="text-2xl font-bold mb-4">Add New Menu Item</h2>
+        <h2 className="text-2xl font-bold mb-4">{initialData ? "Edit Item" : "Add Item"}</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block mb-2">ID</label>
@@ -74,6 +70,7 @@ const AddMenuItem = ({ isOpen, onClose, onAdd }) => {
               onChange={handleChange}
               className="input input-bordered w-full"
               required
+              disabled={!!initialData} // Disable ID field when editing
             />
           </div>
           <div className="mb-4">
@@ -148,7 +145,7 @@ const AddMenuItem = ({ isOpen, onClose, onAdd }) => {
               Cancel
             </button>
             <button type="submit" className="btn btn-primary">
-              Add Item
+              {initialData ? "Update Item" : "Add Item"}
             </button>
           </div>
         </form>

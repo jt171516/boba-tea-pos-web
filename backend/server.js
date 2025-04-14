@@ -84,6 +84,52 @@ app.post("/api/item", async (req, res) => {
     }
   });
 
+// Route to edit an item
+  app.put("/api/item/:id", async (req, res) => {
+    const { id } = req.params;
+    const { name, category, calories, price, sales } = req.body;
+  
+    try {
+      const query = `
+        UPDATE item
+        SET name = $1, category = $2, calories = $3, price = $4, sales = $5
+        WHERE id = $6
+        RETURNING *;
+      `;
+      const values = [name, category, calories, price, sales, id];
+      const result = await pool.query(query, values);
+  
+      if (result.rowCount === 0) {
+        return res.status(404).json({ error: "Item not found" });
+      }
+  
+      res.status(200).json(result.rows[0]);
+    } catch (error) {
+      console.error("Error updating item:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+// Route to delete item
+app.delete("/api/item/:id", async (req, res) => {
+    const { id } = req.params;
+  
+    try {
+      const query = "DELETE FROM item WHERE id = $1 RETURNING *;";
+      const values = [id];
+      const result = await pool.query(query, values);
+  
+      if (result.rowCount === 0) {
+        return res.status(404).json({ error: "Item not found" });
+      }
+  
+      res.status(200).json({ message: "Item deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting item:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
 // Route to get all inventory items
 app.get("/api/inventory", async (req, res) => {
     try {
