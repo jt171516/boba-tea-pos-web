@@ -142,6 +142,43 @@ app.get("/api/inventory", async (req, res) => {
     }
 });
 
+// Route to edit inventory item quantity
+app.put("/api/inventory/:id/quantity", async (req, res) => {
+  const { id } = req.params;
+  const { quantity } = req.body;
+
+  try {
+    const query = `
+      UPDATE inventory
+      SET qty = $1
+      WHERE id = $2
+      RETURNING *;
+    `;
+    const values = [quantity, id];
+    const result = await pool.query(query, values);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Inventory item not found" });
+    }
+
+    res.status(200).json(result.rows[0]); // Return the updated inventory item
+  } catch (error) {
+    console.error("Error updating inventory quantity:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Route to get all employees
+app.get("/api/employees", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM employee");
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching employees:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // Initiate Google authentication
 app.get('/auth/google', (req, res, next) => {
     const redirectUrl = req.query.state || '/';

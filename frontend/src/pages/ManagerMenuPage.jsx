@@ -54,6 +54,9 @@ const ManagerMenuPage = () => {
   };
 
   const handleDeleteItem = async (id) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this item?");
+    if (!confirmDelete) return;
+
     try {
       const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/item/${id}`, {
         method: "DELETE",
@@ -80,7 +83,7 @@ const ManagerMenuPage = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-4">Menu Item Management</h1>
+      <h1 className="text-3xl font-bold mb-4 text-center">Menu Item Management</h1>
 
       <div className="mb-4 flex items-center gap-4">
         <input
@@ -95,7 +98,7 @@ const ManagerMenuPage = () => {
             setItemToEdit(null); // Clear the itemToEdit state for adding a new item
             setIsModalOpen(true);
           }}
-          className="btn btn-primary"
+          className="btn btn-primary px-6 py-3 text-lg" // Increased padding and font size
         >
           Add Item
         </button>
@@ -104,30 +107,30 @@ const ManagerMenuPage = () => {
       <table className="table-auto w-full border-collapse border border-gray-300">
         <thead>
           <tr>
-            <th className="border border-gray-300 px-4 py-2">ID</th>
-            <th className="border border-gray-300 px-4 py-2">Name</th>
-            <th className="border border-gray-300 px-4 py-2">Category</th>
-            <th className="border border-gray-300 px-4 py-2">Calories</th>
-            <th className="border border-gray-300 px-4 py-2">Price</th>
-            <th className="border border-gray-300 px-4 py-2">Sales</th>
-            <th className="border border-gray-300 px-4 py-2">Vegetarian</th>
-            <th className="border border-gray-300 px-4 py-2">Allergens</th>
-            <th className="border border-gray-300 px-4 py-2">Actions</th>
+            <th className="border border-gray-300 px-4 py-2 text-center">ID</th>
+            <th className="border border-gray-300 px-4 py-2 text-center">Name</th>
+            <th className="border border-gray-300 px-4 py-2 text-center">Category</th>
+            <th className="border border-gray-300 px-4 py-2 text-center">Calories</th>
+            <th className="border border-gray-300 px-4 py-2 text-center">Price</th>
+            <th className="border border-gray-300 px-4 py-2 text-center">Sales</th>
+            <th className="border border-gray-300 px-4 py-2 text-center">Vegetarian</th>
+            <th className="border border-gray-300 px-4 py-2 text-center">Allergens</th>
+            <th className="border border-gray-300 px-4 py-2 text-center">Actions</th>
           </tr>
         </thead>
         <tbody>
           {filteredItems.map((item) => (
             <tr key={item.id}>
-              <td className="border border-gray-300 px-4 py-2">{item.id}</td>
-              <td className="border border-gray-300 px-4 py-2">{item.name}</td>
-              <td className="border border-gray-300 px-4 py-2">{item.category}</td>
-              <td className="border border-gray-300 px-4 py-2">{item.calories}</td>
-              <td className="border border-gray-300 px-4 py-2">{item.price}</td>
-              <td className="border border-gray-300 px-4 py-2">{item.sales}</td>
-              <td className="border border-gray-300 px-4 py-2">
+              <td className="border border-gray-300 px-4 py-2 text-center">{item.id}</td>
+              <td className="border border-gray-300 px-4 py-2 text-center">{item.name}</td>
+              <td className="border border-gray-300 px-4 py-2 text-center">{item.category}</td>
+              <td className="border border-gray-300 px-4 py-2 text-center">{item.calories}</td>
+              <td className="border border-gray-300 px-4 py-2 text-center">{item.price}</td>
+              <td className="border border-gray-300 px-4 py-2 text-center">{item.sales}</td>
+              <td className="border border-gray-300 px-4 py-2 text-center">
                 {item.vegetarian ? "Yes" : "No"}
               </td>
-              <td className="border border-gray-300 px-4 py-2">{item.allergens}</td>
+              <td className="border border-gray-300 px-4 py-2 text-center">{item.allergens}</td>
               <td className="border border-gray-300 px-4 py-2 text-center">
                 <button
                   onClick={() => handleEditItem(item)}
