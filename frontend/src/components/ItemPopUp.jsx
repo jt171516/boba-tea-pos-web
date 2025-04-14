@@ -45,17 +45,62 @@ const ItemPopUp = ({ isOpen, onClose, item }) => {
         }
     }
 
-    const handleAddToOrder = () => {
-        const orderDetails = {
-            item: item.name,
-            size: selectedSize || 'Not selected',
-            ice: selectedIce || 'Not selected',
-            sugar: selectedSugar || 'Not selected',
-            toppings: selectedToppings.length > 0 ? selectedToppings.join(', ') : 'No toppings selected',
-        };
-        alert(`Order added: ${JSON.stringify(orderDetails,null,2)}`);
-        onClose();
-    }
+    const handleAddToOrder = async () => {
+        try {
+            // Preprocess ice and sugar levels to remove the '%' symbol and convert to integers
+            const processedSize = selectedSize == 'Small' ? 'S':
+                                  selectedSize == 'Medium' ? 'M' :
+                                  selectedSize == 'Large' ? 'L' : '';
+
+            const processedIce = parseInt(selectedIce.replace('%', ''), 10);
+            const processedSugar = parseInt(selectedSugar.replace('%', ''), 10);
+            // Get the item ID by item name
+            const itemResponse = await fetch (`http://localhost:5001/api/item/${item.name}`);
+            if (!itemResponse.ok) {
+                throw new Error('Failed to fetch item ID');
+            }
+            const itemData = await itemResponse.json();
+
+            // Get the modifiers
+            const modifiersResponse = await fetch('http://localhost:5001/api/modifiers', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    size: processedSize,
+                    sugar: processedSugar,
+                    ice: processedIce,
+                    toppings: selectedToppings,
+                }),
+            });
+
+            if (!modifiersResponse.ok) {
+                throw new Error('Failed to fetch modifiers');
+            }
+            const modifiersData = await modifiersResponse.json();
+
+            console.log('Modifiers Data:', modifiersData);
+
+            console.log('Payload for /api/ordersitemmodifierjunction:', {
+                item_id: itemData.id,
+                modifiers_id: modifiersData.map((modifier) => modifier.id),
+            });
+
+            await fetch('http://localhost:5001/api/ordersitemmodifierjunction', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    itemId: itemData.id,
+                    modifiers: modifiersData.map(modifier => modifier.id),
+                }),
+            });
+
+            alert(`Item added successfully to order!`);
+            onClose();
+        }catch (error) {
+            console.error('Error adding order:', error);
+            alert(`Failed to add order: ${error.message}`);
+        }
+}
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
