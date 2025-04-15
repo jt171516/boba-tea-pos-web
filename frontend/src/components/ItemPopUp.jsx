@@ -137,6 +137,12 @@ const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, setOrderItems}) => {
                         <p>
                             {item?.price ? `$${item.price}` : "Price not available"} | {item?.calories ? `${item.calories} calories` : "Calories not available"}
                         </p>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                        {item.vegetarian && (<span className="badge badge-success">{item.vegetarian}</span>)}
+                        {item.allergen && item.allergen.map((allergen, index) => (
+                            <span key={index} className="badge badge-warning">{allergen}</span>
+                        ))}
+                        </div>
                     </div>
                 </div>
 

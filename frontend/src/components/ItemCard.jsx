@@ -6,7 +6,7 @@ export default function ItemCard({ item, onClick }) {
     onClick={onClick}>
       <figure>
         <img
-          src={item.image}
+          src={item?.image || "https://s3-media0.fl.yelpcdn.com/bphoto/GBAD5WodnuFXpi3Q3CnQGw/348s.jpg"}
           alt={item.name}
           className="w-full h-40 object-cover rounded-t-lg"
         />

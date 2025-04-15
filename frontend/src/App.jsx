@@ -14,7 +14,7 @@ import ManagerInventoryPage from "./pages/ManagerInventoryPage";
 import ManagerEmployeesPage from "./pages/ManagerEmployeesPage";
 
 import WorkerPage from './pages/WorkerPage';
-
+import MenuBoard from './pages/MenuBoard'; // Import MenuBoard
 
 function App() {
   return (
@@ -33,6 +33,7 @@ function App() {
         </Route>
 
         <Route path="/worker" element={<WorkerPage />} />  
+        <Route path="/menu-board" element={<MenuBoard />} /> {/* Add MenuBoard route */}
       </Routes>
     </div>
   );

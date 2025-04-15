@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import ItemCard from '../components/ItemCard';
@@ -22,6 +22,8 @@ function CustomerPage() {
   const [currentOrderId, setCurrentOrderId] = useState(null); 
   const [orderItems, setOrderItems] = useState([]);
   const navigate = useNavigate(); //useNavigate hook to navigate to the payment page
+  const recognitionRef = useRef(null);
+  const [listening, setListening] = useState(false);
 
   // Fetch items from database
   useEffect(() => {
@@ -68,6 +70,31 @@ function CustomerPage() {
     initializePage();
 
   }, []);
+
+  useEffect(() => {
+    if ('webkitSpeechRecognition' in window) {
+      const SpeechRecognition = window.webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.lang = 'en-US';
+
+      recognitionRef.current.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setSearchQuery(transcript); // For example, setSearchQuery(transcript) or parse items to order
+      };
+    }
+  }, []);
+
+  const handleVoiceToggle = () => {
+    if (!recognitionRef.current) return;
+    if (listening) {
+      recognitionRef.current.stop();
+    } else {
+      recognitionRef.current.start();
+    }
+    setListening(!listening);
+  };
 
   // Filter items based on category and search
   const filteredItems = items.filter((item) => {
@@ -131,7 +158,7 @@ function CustomerPage() {
           </h1>
 
           {/* Search for drinks */}
-          <div className="mb-4 mx-4">
+          <div className="mb-4 mx-4 flex gap-2">
             <input
               type="text"
               placeholder="Search"
@@ -139,12 +166,15 @@ function CustomerPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="border border-gray-300 rounded-lg px-4 py-2 w-full"
             />
+            <button onClick={handleVoiceToggle} className="btn">
+              {listening ? "Stop Voice Ordering" : "Start Voice Ordering"}
+            </button>
           </div>
 
           {/* Display filtered drinks using ItemCard */}
           <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 justify-center mx-auto">
             {filteredItems.map((item) => (
-              <ItemCard key={item.id} item={item} onClick={() => handleItemClick(item)}/>
+              <ItemCard key={item.id} item={item} onClick={() => handleItemClick(item)} />
             ))}
           </div>
         </div>
