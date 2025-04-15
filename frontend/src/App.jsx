@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import HomePage from './pages/HomePage';
 import FoodMenu from './pages/FoodMenu';
 import CustomerPage from './pages/CustomerPage';
+import PaymentPage from './pages/PaymentPage';
 
 import ManagerPage from './pages/ManagerPage';
 import ManagerMenuPage from "./pages/ManagerMenuPage"
@@ -22,6 +23,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/menu" element={<FoodMenu />} />
         <Route path="/customer/:category?" element={<CustomerPage />} />
+        <Route path= "/payment/:orderId" element={<PaymentPage />} />
 
         <Route path="/manager" element={<ManagerPage />}>
           <Route path="sales" element={<ManagerSalesPage />} />
