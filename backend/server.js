@@ -37,7 +37,7 @@ app.use(session({
     cookie: {
         secure: process.env.NODE_ENV === "production",
         sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-        domain: process.env.NODE_ENV === "production" ? ".onrender.com" : undefined,
+        domain: process.env.NODE_ENV === "production" ? "onrender.com" : undefined,
     } 
 }));
 app.use(passport.initialize());
