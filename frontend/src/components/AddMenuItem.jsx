@@ -150,16 +150,7 @@ const AddMenuItem = ({ isOpen, onClose, onAdd, initialData }) => {
               required
             />
           </div>
-          <div className="mb-4">
-            <label className="block mb-2">Vegetarian</label>
-            <input
-              type="checkbox"
-              name="vegetarian"
-              checked={formData.vegetarian}
-              onChange={handleChange}
-              className="checkbox"
-            />
-          </div>
+          
           <div className="mb-4">
             <label className="block mb-2">Allergens</label>
             <input
