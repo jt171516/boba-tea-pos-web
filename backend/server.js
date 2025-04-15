@@ -178,7 +178,7 @@ app.get("/api/employees", async (req, res) => {
     console.error("Error fetching employees:", error);
     res.status(500).json({ error: "Internal server error" });
   }
-
+});
 // Route to get item id by name
 app.get("/api/item/:name", async (req, res) => {
     const itemName = req.params.name;
