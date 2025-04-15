@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import ItemCard from '../components/ItemCard';
 import TopBar from '../components/TopBar';
 import SideMenu from '../components/SideMenu';
@@ -18,26 +19,54 @@ function CustomerPage() {
   const { category } = useParams();
   const [isPopUpOpen, setIsPopUpOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null); //state to keep track of the selected item
+  const [currentOrderId, setCurrentOrderId] = useState(null); 
+  const [orderItems, setOrderItems] = useState([]);
+  const navigate = useNavigate(); //useNavigate hook to navigate to the payment page
 
   // Fetch items from database
   useEffect(() => {
-    const fetchItems = async () => {
+    const initializePage = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/item`);
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
+        const fetchItems = async () => {
+            const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/item`);
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+    
+            // Sort items by ID
+            const sortedData = data.sort((a, b) => a.id - b.id);
+            setItems(sortedData);
+        };
+    
+        await fetchItems();
 
-        // Sort items by ID
-        const sortedData = data.sort((a, b) => a.id - b.id);
-        setItems(sortedData);
+        //Check to see if there is an open order, if not a create a new one
+        const fetchOpenOrder = async () => {
+          const response = await fetch ("http://localhost:5001/api/orders/open");
+          if (response.ok){
+            const data = await response.json();
+            setCurrentOrderId(data.id); //Use the exisitng open order
+            console.log("Open Order ID:", data.id);
+          } else {
+            //No open order, create a new one
+            const response = await fetch ("http://localhost:5001/api/createOrder", {
+              method: "POST",
+              headers: {"Content-Type": "application/json"},
+            });
+            const createData = await response.json();
+            setCurrentOrderId(createData.orderId); // Set the new order ID
+          }
+        };
+
+      await fetchOpenOrder();
       } catch (error) {
-        console.error('Error fetching items:', error);
+        console.error('Error fetching or creating order:', error);
       }
     };
 
-    fetchItems();
+    initializePage();
+
   }, []);
 
   // Filter items based on category and search
@@ -51,6 +80,41 @@ function CustomerPage() {
   const handleItemClick = (item) => {
     setSelectedItem(item); //set the selected item
     setIsPopUpOpen(true); //open the pop-up
+  };
+
+  const handleSubmitOrder = async () => {
+    try {
+      const totalPrice = orderItems.reduce((sum, item) => sum + item.price, 0);
+
+      await fetch(`http://localhost:5001/api/orders/${currentOrderId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          totalPrice: totalPrice,
+          payment: "Pending",
+          is_closed: true,
+        }),
+      });
+
+      alert("Order submitted successfully!");
+      setOrderItems([]); // Clear the order items after submission
+      
+      /*
+      const response = await fetch ("https://localhost:5501/api/createOrder", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+      });
+      const data = await response.json();
+      setCurrentOrderId(data.orderId);
+      console.log("New Order ID: ", data.orderId);
+      */
+     navigate(`/payment/${currentOrderId}`);
+    } catch (error) {
+      console.error('Error submitting order:', error);
+      alert(`Failed to submit order: ${error.message}`);
+    }
   };
 
   return (
@@ -85,11 +149,23 @@ function CustomerPage() {
           </div>
         </div>
       </div>
+
+      <div className="fixed bottom-4 right-4">
+        <button
+          className="btn btn-primary px-6 py-2 text-lg font-bold"
+          onClick={handleSubmitOrder}
+        >
+          Submit Order
+        </button>
+      </div>
+
       {isPopUpOpen && (
             <ItemPopUp
             isOpen={isPopUpOpen}
             onClose={() => setIsPopUpOpen(false)}
             item={selectedItem}
+            currentOrderId = {currentOrderId}
+            setOrderItems={setOrderItems}
           />
         )}
     </main>

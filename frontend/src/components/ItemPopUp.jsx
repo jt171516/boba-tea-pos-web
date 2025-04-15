@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 
-const ItemPopUp = ({ isOpen, onClose, item }) => {
+const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, setOrderItems}) => {
     useEffect(() => {
         if (isOpen) {
             //add the no-scroll class to the body when the popup is open
@@ -54,13 +54,30 @@ const ItemPopUp = ({ isOpen, onClose, item }) => {
 
             const processedIce = parseInt(selectedIce.replace('%', ''), 10);
             const processedSugar = parseInt(selectedSugar.replace('%', ''), 10);
-            // Get the item ID by item name
+
+            // Get the item id by item name
             const itemResponse = await fetch (`http://localhost:5001/api/item/${item.name}`);
             if (!itemResponse.ok) {
                 throw new Error('Failed to fetch item ID');
             }
             const itemData = await itemResponse.json();
 
+            console.log('Item name:', item.name);
+            //Add the orderid and itemid to the ordersitemjunction
+            const orderItemResponse = await fetch('http://localhost:5001/api/orderItemId', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    orderId: currentOrderId,
+                    itemId: itemData.id,
+                    itemName: item.name,
+                }),
+            });
+            if (!orderItemResponse.ok) {
+                throw new Error('Failed to create orderItemId');
+            }
+            const {orderItemId} = await orderItemResponse.json();
+            
             // Get the modifiers
             const modifiersResponse = await fetch('http://localhost:5001/api/modifiers', {
                 method: 'POST',
@@ -81,18 +98,22 @@ const ItemPopUp = ({ isOpen, onClose, item }) => {
             console.log('Modifiers Data:', modifiersData);
 
             console.log('Payload for /api/ordersitemmodifierjunction:', {
-                item_id: itemData.id,
+                orderItemId,
                 modifiers_id: modifiersData.map((modifier) => modifier.id),
             });
 
+
+            // Insert into ordersitemmodifierjunction table
             await fetch('http://localhost:5001/api/ordersitemmodifierjunction', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                    itemId: itemData.id,
+                    orderItemId,
                     modifiers: modifiersData.map(modifier => modifier.id),
                 }),
             });
+
+            setOrderItems((prevItems) => [...prevItems, {itemId: itemData.id, orderItemId}]);
 
             alert(`Item added successfully to order!`);
             onClose();
@@ -104,7 +125,7 @@ const ItemPopUp = ({ isOpen, onClose, item }) => {
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-base-100 rounded-lg shadow-lg w-auto h-96 p-6 m-6 relative overflow-y-scroll ml-64">
+            <div className="bg-base-100 rounded-lg shadow-lg w-auto h-5/6 p-6 m-6 relative overflow-y-scroll ml-64">
                 <div className="flex items-start space-x-4">
                     <img
                         src={item?.image || "https://s3-media0.fl.yelpcdn.com/bphoto/GBAD5WodnuFXpi3Q3CnQGw/348s.jpg"}

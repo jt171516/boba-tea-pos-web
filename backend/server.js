@@ -76,7 +76,7 @@ app.get("/api/inventory", async (req, res) => {
     }
 });
 
-// Route to get an item by name
+// Route to get item id by name
 app.get("/api/item/:name", async (req, res) => {
     const itemName = req.params.name;
     try {
@@ -87,6 +87,74 @@ app.get("/api/item/:name", async (req, res) => {
         res.json(result.rows[0]);
     } catch (error) {
         console.error("Error fetching item:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+// Route to get the most recent open order
+app.get("/api/orders/open", async (req, res) => {
+    try{
+        const result = await pool.query("SELECT * FROM orders WHERE is_closed = false ORDER BY id DESC LIMIT 1");
+        if (result.rows.length === 0){
+            return res.status(404).json({ error: "No open orders found" });
+        }
+        res.json(result.rows[0]);
+    } catch (error) {
+        console.error("Error fetching orders:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+// Route to create a new order entry with empty values
+app.post("/api/createOrder", async (req, res) => {
+    try{
+        const result = await pool.query(
+            "INSERT INTO orders (name, totalprice, timestamp, payment, is_closed) VALUES ($1, $2, $3, $4, $5) RETURNING id", 
+            ["", 0, new Date().toISOString(),"", false]
+        );
+        const orderId = result.rows[0].id;
+        res.status(201).json({ orderId });
+    } catch (error) {
+        console.error("Error creating dummy order:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+// Route to submit an order
+app.put("/api/orders/:id", async (req, res) => {
+    const {id} = req.params;
+    const {totalprice, payment, is_closed} = req.body;
+    try {
+        await pool.query(
+            "UPDATE orders SET totalprice = $1, timestamp = $2, payment = $3, is_closed = $4 WHERE id = $5",
+            [totalprice, new Date().toISOString(), payment, is_closed, id]
+        );
+        res.status(200).json({ message: "Order submitted successfully" });
+    } catch (error) {
+        console.error("Error submitting order:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+ 
+//Route to create a new orderItemId and update the order's name column
+app.post("/api/orderItemId", async (req, res) => {
+    const {orderId, itemId, itemName} = req.body;
+    try {
+        const result = await pool.query(
+            "INSERT INTO ordersitemjunction (orderid, itemid) VALUES ($1, $2) RETURNING orderitemid",
+            [orderId, itemId]
+        );
+        const orderItemId = result.rows[0].orderitemid;
+
+        //const sanitizedItemName = String(itemName).trim();
+        await pool.query(
+            "UPDATE orders SET name = COALESCE(name, '') || CASE WHEN name IS NULL OR name = '' THEN '' ELSE ', ' END || $1 WHERE id = $2",
+            [itemName, orderId]
+        );
+
+        res.status(201).json({ orderItemId });
+    } catch (error) {
+        console.error("Error creating order item ID:", error);
         res.status(500).json({ error: "Internal server error" });
     }
 });
@@ -115,21 +183,38 @@ app.post("/api/modifiers", async (req, res) => {
 //Route to insert into ordersitemmodifierjunction table
 app.post("/api/ordersitemmodifierjunction", async (req, res) => {
     //Receive item ID and modifier IDs from the frontend
-    const { itemId, modifiers} = req.body; 
+    const { orderItemId, modifiers} = req.body; 
     
-    console.log("Received itemId:", itemId);
+    console.log("Received itemId:", orderItemId);
     console.log("Received modifiers_id:", modifiers);
 
     try {
         for (const modifier of modifiers){
             await pool.query(
                 "INSERT INTO ordersitemmodifierjunction (orderitemid, modifierid, qty) VALUES ($1, $2, $3)",
-                [itemId, modifier, 1]
+                [orderItemId, modifier, 1]
             );
         }
         res.status(201).json({ message: "Modifiers inserted successfully" });
     } catch (error) {
         console.error("Error inserting into ordersitemmodifierjunction:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+// Route to update the payment method for an order
+app.put("/api/orders/:id/payment", async (req, res) => {
+    const { id } = req.params;
+    const { payment } = req.body;
+
+    try {
+        await pool.query(
+            "UPDATE orders SET payment = $1 WHERE id = $2",
+            [payment, id]
+        );
+        res.status(200).json({ message: "Payment method updated successfully" });
+    } catch (error) {
+        console.error("Error updating payment method:", error);
         res.status(500).json({ error: "Internal server error" });
     }
 });
