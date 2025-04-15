@@ -30,7 +30,7 @@ const app = express();
 const PORT = 5001;
 
 // Set up session and passport middleware
-app.use(session({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: true, cookie: { secure: false } }));
+app.use(session({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: true, cookie: { secure: process.env.NODE_ENV === "production", sameSite: process.env.NODE_ENV === "production" ? "none" : "lax" } }));
 app.use(passport.initialize());
 app.use(passport.session());
 
