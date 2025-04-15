@@ -64,6 +64,72 @@ app.get("/api/item", async (req, res) => {
     }
 });
 
+// Route to submit new item 
+app.post("/api/item", async (req, res) => {
+    const { id, name, category, calories, price, sales, vegetarian, allergens } = req.body;
+  
+    try {
+      const query = `
+        INSERT INTO item (id, name, category, calories, price, sales, vegetarian, allergens)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        RETURNING *;
+      `;
+      const values = [id, name, category, calories, price, sales, vegetarian, allergens];
+      const result = await pool.query(query, values);
+  
+      res.status(201).json(result.rows[0]); // Return the newly added item
+    } catch (error) {
+      console.error("Error inserting item:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+// Route to edit an item
+  app.put("/api/item/:id", async (req, res) => {
+    const { id } = req.params;
+    const { name, category, calories, price, sales } = req.body;
+  
+    try {
+      const query = `
+        UPDATE item
+        SET name = $1, category = $2, calories = $3, price = $4, sales = $5
+        WHERE id = $6
+        RETURNING *;
+      `;
+      const values = [name, category, calories, price, sales, id];
+      const result = await pool.query(query, values);
+  
+      if (result.rowCount === 0) {
+        return res.status(404).json({ error: "Item not found" });
+      }
+  
+      res.status(200).json(result.rows[0]);
+    } catch (error) {
+      console.error("Error updating item:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+// Route to delete item
+app.delete("/api/item/:id", async (req, res) => {
+    const { id } = req.params;
+  
+    try {
+      const query = "DELETE FROM item WHERE id = $1 RETURNING *;";
+      const values = [id];
+      const result = await pool.query(query, values);
+  
+      if (result.rowCount === 0) {
+        return res.status(404).json({ error: "Item not found" });
+      }
+  
+      res.status(200).json({ message: "Item deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting item:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
 // Route to get all inventory items
 app.get("/api/inventory", async (req, res) => {
     try {
@@ -75,6 +141,43 @@ app.get("/api/inventory", async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
+
+// Route to edit inventory item quantity
+app.put("/api/inventory/:id/quantity", async (req, res) => {
+  const { id } = req.params;
+  const { quantity } = req.body;
+
+  try {
+    const query = `
+      UPDATE inventory
+      SET qty = $1
+      WHERE id = $2
+      RETURNING *;
+    `;
+    const values = [quantity, id];
+    const result = await pool.query(query, values);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Inventory item not found" });
+    }
+
+    res.status(200).json(result.rows[0]); // Return the updated inventory item
+  } catch (error) {
+    console.error("Error updating inventory quantity:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Route to get all employees
+app.get("/api/employees", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM employee");
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching employees:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 
 // Route to get item id by name
 app.get("/api/item/:name", async (req, res) => {
@@ -217,6 +320,7 @@ app.put("/api/orders/:id/payment", async (req, res) => {
         console.error("Error updating payment method:", error);
         res.status(500).json({ error: "Internal server error" });
     }
+
 });
 
 // Initiate Google authentication

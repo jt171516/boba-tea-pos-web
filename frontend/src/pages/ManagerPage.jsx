@@ -5,7 +5,7 @@ import TopBar from "../components/TopBar";
 import { toast, Toaster } from "react-hot-toast";
 
 const ManagerPage = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
 

@@ -9,6 +9,7 @@ passport.use(new GoogleStrategy({
     clientID:     process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: `${process.env.CURRENT_LOCALHOST}/auth/google/callback`,
+    scope: ["profile", "email"],
     passReqToCallback: true
   },
   // Authentication is successful if the user is from TAMU
@@ -19,7 +20,7 @@ passport.use(new GoogleStrategy({
     else {
       return done(null, profile);
     }
-  }
+   }
 ));
 
 // Serialize and deserialize user information
