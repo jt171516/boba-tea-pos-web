@@ -66,15 +66,15 @@ app.get("/api/item", async (req, res) => {
 
 // Route to submit new item 
 app.post("/api/item", async (req, res) => {
-    const { id, name, category, calories, price, sales, vegetarian, allergens } = req.body;
+    const { id, name, category, calories, price, sales } = req.body;
   
     try {
       const query = `
-        INSERT INTO item (id, name, category, calories, price, sales, vegetarian, allergens)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        INSERT INTO item (id, name, category, calories, price, sales)
+        VALUES ($1, $2, $3, $4, $5, $6)
         RETURNING *;
       `;
-      const values = [id, name, category, calories, price, sales, vegetarian, allergens];
+      const values = [id, name, category, calories, price, sales];
       const result = await pool.query(query, values);
   
       res.status(201).json(result.rows[0]); // Return the newly added item

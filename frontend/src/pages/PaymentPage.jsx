@@ -14,7 +14,7 @@ function PaymentPage() {
 
     try {
       // Update the payment column in the orders table
-      await fetch(`http://localhost:5001/api/orders/${orderId}/payment`, {
+      await fetch(`${import.meta.env.VITE_APP_API_URL}/orders/${orderId}/payment`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
