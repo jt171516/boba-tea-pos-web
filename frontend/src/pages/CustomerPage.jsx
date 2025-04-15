@@ -45,14 +45,14 @@ function CustomerPage() {
 
         //Check to see if there is an open order, if not a create a new one
         const fetchOpenOrder = async () => {
-          const response = await fetch ("http://localhost:5001/api/orders/open");
+          const response = await fetch (`${import.meta.env.VITE_APP_API_URL}/orders/open`);
           if (response.ok){
             const data = await response.json();
             setCurrentOrderId(data.id); //Use the exisitng open order
             console.log("Open Order ID:", data.id);
           } else {
             //No open order, create a new one
-            const response = await fetch ("http://localhost:5001/api/createOrder", {
+            const response = await fetch (`${import.meta.env.VITE_APP_API_URL}/createOrder`, {
               method: "POST",
               headers: {"Content-Type": "application/json"},
             });
@@ -113,7 +113,7 @@ function CustomerPage() {
     try {
       const totalPrice = orderItems.reduce((sum, item) => sum + item.price, 0);
 
-      await fetch(`http://localhost:5001/api/orders/${currentOrderId}`, {
+      await fetch(`${import.meta.env.VITE_APP_API_URL}/orders/${currentOrderId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
