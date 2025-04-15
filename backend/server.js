@@ -27,6 +27,7 @@ const pool = new Pool({
 
 // Express app setup
 const app = express();
+app.set("trust proxy", 1);
 const PORT = 5001;
 
 // Set up session and passport middleware
