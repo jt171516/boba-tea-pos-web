@@ -56,7 +56,7 @@ const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, setOrderItems}) => {
             const processedSugar = parseInt(selectedSugar.replace('%', ''), 10);
 
             // Get the item id by item name
-            const itemResponse = await fetch (`http://localhost:5001/api/item/${item.name}`);
+            const itemResponse = await fetch (`${import.meta.env.VITE_APP_API_URL}/item/${item.name}`);
             if (!itemResponse.ok) {
                 throw new Error('Failed to fetch item ID');
             }
@@ -64,7 +64,7 @@ const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, setOrderItems}) => {
 
             console.log('Item name:', item.name);
             //Add the orderid and itemid to the ordersitemjunction
-            const orderItemResponse = await fetch('http://localhost:5001/api/orderItemId', {
+            const orderItemResponse = await fetch(`${import.meta.env.VITE_APP_API_URL}/orderItemId`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
@@ -79,7 +79,7 @@ const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, setOrderItems}) => {
             const {orderItemId} = await orderItemResponse.json();
             
             // Get the modifiers
-            const modifiersResponse = await fetch('http://localhost:5001/api/modifiers', {
+            const modifiersResponse = await fetch(`${import.meta.env.VITE_APP_API_URL}/modifiers`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
@@ -104,7 +104,7 @@ const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, setOrderItems}) => {
 
 
             // Insert into ordersitemmodifierjunction table
-            await fetch('http://localhost:5001/api/ordersitemmodifierjunction', {
+            await fetch(`${import.meta.env.VITE_APP_API_URL}/ordersitemmodifierjunction`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
