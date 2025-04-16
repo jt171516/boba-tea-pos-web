@@ -22,6 +22,12 @@ const ManagerPage = () => {
     const urlParams = new URLSearchParams(location.search);
     const loginFailure = urlParams.get("loginFailure");
     const logout = urlParams.get("logout");
+    const URLtoken = urlParams.get("token");
+
+    if (URLtoken) {
+      localStorage.setItem("token", URLtoken);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
     
     // Display appropriate toast messages based on URL parameters
     if (loginFailure) {
@@ -30,16 +36,24 @@ const ManagerPage = () => {
     }
 
     if (logout) {
+      localStorage.removeItem("token");
       toast.success("Logged out successfully.");
       navigate(location.pathname, { replace: true });
     }
 
     // Check if the user is logged in by making a request to protected route
-    fetch(`${import.meta.env.VITE_APP_AUTH_URL}/protected`, { credentials: "include" })
+    const token = localStorage.getItem("token");
+    if (token) {
+      fetch(`${import.meta.env.VITE_APP_AUTH_URL}/protected`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((response) => {
         if (response.ok) {
           setIsLoggedIn(true);
-        } else {
+        } 
+        else {
           setIsLoggedIn(false);
         }
       })
@@ -47,6 +61,10 @@ const ManagerPage = () => {
         console.error("Error fetching login status:", error);
         setIsLoggedIn(false);
       });
+    }
+    else {
+      setIsLoggedIn(false);
+    }
   }, [location, navigate]);
 
   return (

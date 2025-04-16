@@ -6,14 +6,10 @@ import cors from "cors";
 import dotenv from "dotenv";
 import pg from "pg";
 import passport from "passport";
+import jwt from "jsonwebtoken";
 import "./auth.js";
 
 dotenv.config();
-
-// Check if user is logged in
-function isLoggedIn(req, res, next) {
-    req.user ? next() : res.sendStatus(401);
-}
 
 // set up PostgreSQL connection
 const { Pool } = pg;
@@ -33,15 +29,9 @@ const PORT = 5001;
 // Set up session and passport middleware
 app.use(session({ 
     secret: process.env.SESSION_SECRET,
-    resave: false, saveUninitialized: true,
-    cookie: {
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-        domain: process.env.NODE_ENV === "production" ? "onrender.com" : undefined,
-    } 
+    resave: false, saveUninitialized: false,
+    cookie: { secure: process.env.NODE_ENV === "production", } 
 }));
-app.use(passport.initialize());
-app.use(passport.session());
 
 // Configure CORS
 const corsOptions = {
@@ -335,39 +325,36 @@ app.put("/api/orders/:id/payment", async (req, res) => {
 // Initiate Google authentication
 app.get('/auth/google', (req, res, next) => {
     const redirectUrl = req.query.state || '/';
-    req.session.redirectTo = redirectUrl;
-    passport.authenticate('google', { scope: ['email', 'profile'], state: redirectUrl })(req, res, next);
+    req.session.redirectUrl = redirectUrl;
+    passport.authenticate('google', { scope: ['email', 'profile'], state: redirectUrl, session: false })(req, res, next);
 });
 
 // Callback route for authentication
 app.get('/auth/google/callback', 
-    passport.authenticate('google', { failureRedirect: '/auth/failure' }),
+    passport.authenticate('google', { failureRedirect: '/auth/failure', session: false }),
     (req, res) => {
-      const redirectUrl = req.query.state || '/';
-      req.session.redirectTo = null;
-      res.redirect(redirectUrl);
+        const token = jwt.sign({ user: req.user }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const redirectUrl = req.query.state || '/';
+        res.redirect(`${redirectUrl}?token=${token}`);
     }
 );
 
 // Redirect for failed authentication
 app.get('/auth/failure', (req, res) => {
-    const redirectUrl = req.session.redirectTo || '/';
-    req.session.redirectTo = null
+    const redirectUrl = req.session.redirectUrl || '/';
+    req.session.redirectUrl = null;
     res.redirect(`${redirectUrl}?loginFailure=true`);
 });
 
 // Protected route to check if user is logged in
-app.get('/auth/protected', isLoggedIn, (req, res) => {
+app.get('/auth/protected', passport.authenticate('jwt', {session: false }), (req, res) => {
     res.send(`Hello ${req.user.displayName}, you are authenticated!`);
 });
 
 // Logout route
 app.get('/auth/logout', (req, res) => {
     const redirectUrl = req.query.state || '/';
-    req.logout(function(err) {
-        if (err) { return next(err); }
-        res.redirect(`${redirectUrl}?logout=true`);
-    });
+    res.redirect(`${redirectUrl}?logout=true`);
 });
 
 app.listen(PORT, () => {
