@@ -5,3 +5,26 @@
 .no-scroll {
     overflow: hidden;
 }
+
+@layer base {
+    body {
+        top: 0 !important;
+    }
+     
+    body > .skiptranslate, .goog-te-gadget span, div#goog-gt-{
+        @apply hidden !important;
+    }
+
+    .goog-logo-link {
+        @apply hidden !important;
+    }
+
+    .goog-te-gadget {
+        @apply text-transparent !important;
+        font-size: 0 !important;
+    }
+
+    #googleTranslateElement .goog-te-combo {
+        @apply bg-gray-900 text-white rounded-lg px-2 py-2 shadow-inner border-none !important;
+    }
+}
