@@ -29,21 +29,21 @@ function TopBar()
   }, []);
 
   return (
-    <div className="z-10 w-full h-16 bg-gray-800 text-white flex justify-between items-center px-4 py-2 sticky top-0">
+    <div className="z-10 w-full h-14 bg-gray-800 text-white flex justify-between items-center px-4 py-2 sticky top-0">
       <div>
         {time.toLocaleTimeString()}
       </div>
-      <div>
+      <div className="flex items-center space-x-6">
         <Translate />
-      </div>
-      <div>
-        Weather:{" "}
-        <span className="text-blue-300">
-          {weatherData ? weatherData.name : 'Loading...'}{" "}
-          {weatherData && weatherData.main ? 
-            weatherData.main.temp + '°K'
-            : ''}
-        </span>
+        <div>
+          Weather:{" "}
+          <span className="text-blue-300">
+            {weatherData ? weatherData.name : 'Loading...'}{" "}
+            {weatherData && weatherData.main ? 
+              weatherData.main.temp + '°K'
+              : ''}
+          </span>
+        </div>
       </div>
     </div>
   );

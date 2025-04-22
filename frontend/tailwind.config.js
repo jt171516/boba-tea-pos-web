@@ -4,7 +4,12 @@ import daisyui from "daisyui";
 export default {
   content: [
     "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    "./src/**/*.{js,ts,jsx,tsx,html}",
+  ],
+  safelist: [
+    "goog-te-combo",
+    "goog-logo-link",
+    "goog-te-gadget",
   ],
   theme: {
     extend: {},
