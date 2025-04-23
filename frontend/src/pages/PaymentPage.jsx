@@ -31,6 +31,7 @@ function PaymentPage() {
 
   const handleFinishOrder = () => {
     // Navigate back to the HomePage
+    alert("Order submitted successfully!");
     navigate('/');
   };
 
