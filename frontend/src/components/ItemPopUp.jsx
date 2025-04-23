@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 
-const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, setOrderItems}) => {
+const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, updateSum}) => {
     useEffect(() => {
         if (isOpen) {
             //add the no-scroll class to the body when the popup is open
@@ -47,6 +47,10 @@ const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, setOrderItems}) => {
 
     const handleAddToOrder = async () => {
         try {
+            if (!selectedSize || !selectedIce || !selectedSugar) {
+                alert('Please make sure size, ice level, and sugar level are all selected.');
+                return;
+            }
             // Preprocess ice and sugar levels to remove the '%' symbol and convert to integers
             const processedSize = selectedSize == 'Small' ? 'S':
                                   selectedSize == 'Medium' ? 'M' :
@@ -102,6 +106,7 @@ const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, setOrderItems}) => {
                 modifiers_id: modifiersData.map((modifier) => modifier.id),
             });
 
+            updateSum(itemData.price);
 
             // Insert into ordersitemmodifierjunction table
             await fetch(`${import.meta.env.VITE_APP_API_URL}/ordersitemmodifierjunction`, {
@@ -113,9 +118,8 @@ const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, setOrderItems}) => {
                 }),
             });
 
-            setOrderItems((prevItems) => [...prevItems, {itemId: itemData.id, orderItemId}]);
-
             alert(`Item added successfully to order!`);
+
             onClose();
         }catch (error) {
             console.error('Error adding order:', error);

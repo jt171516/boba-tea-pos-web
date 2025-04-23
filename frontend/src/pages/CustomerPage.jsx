@@ -20,7 +20,7 @@ function CustomerPage() {
   const [isPopUpOpen, setIsPopUpOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null); //state to keep track of the selected item
   const [currentOrderId, setCurrentOrderId] = useState(null); 
-  const [orderItems, setOrderItems] = useState([]);
+  const [sum, setSum] = useState(0);
   const navigate = useNavigate(); //useNavigate hook to navigate to the payment page
   const recognitionRef = useRef(null);
   const [listening, setListening] = useState(false);
@@ -103,6 +103,10 @@ function CustomerPage() {
     return inCategory && inSearchQuery;
   });
 
+  const updateSum = (itemPrice) => {
+    setSum((prevSum) => prevSum + itemPrice);
+  };
+
   //function to handle when an ItemCard is clicked
   const handleItemClick = (item) => {
     setSelectedItem(item); //set the selected item
@@ -111,33 +115,20 @@ function CustomerPage() {
 
   const handleSubmitOrder = async () => {
     try {
-      const totalPrice = orderItems.reduce((sum, item) => sum + item.price, 0);
-
       await fetch(`${import.meta.env.VITE_APP_API_URL}/orders/${currentOrderId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          totalPrice: totalPrice,
+          totalprice: sum,
           payment: "Pending",
           is_closed: true,
         }),
       });
 
-      alert("Order submitted successfully!");
-      setOrderItems([]); // Clear the order items after submission
-      
-      /*
-      const response = await fetch ("https://localhost:5501/api/createOrder", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-      });
-      const data = await response.json();
-      setCurrentOrderId(data.orderId);
-      console.log("New Order ID: ", data.orderId);
-      */
      navigate(`/payment/${currentOrderId}`);
+
     } catch (error) {
       console.error('Error submitting order:', error);
       alert(`Failed to submit order: ${error.message}`);
@@ -195,7 +186,7 @@ function CustomerPage() {
             onClose={() => setIsPopUpOpen(false)}
             item={selectedItem}
             currentOrderId = {currentOrderId}
-            setOrderItems={setOrderItems}
+            updateSum = {(itemPrice) => updateSum(itemPrice)}
           />
         )}
     </main>
