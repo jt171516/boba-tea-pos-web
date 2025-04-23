@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AccessibilityControls from './AccessibilityControls';
 
 function TopBar() 
 {
@@ -32,13 +33,14 @@ function TopBar()
       <div>
         {time.toLocaleTimeString()}
       </div>
-      <div>
-        Weather:{" "}
-        <span className="text-blue-300">
-          {weatherData ? weatherData.name : 'Loading...'}{" "}
-          {weatherData && weatherData.main ? 
-            weatherData.main.temp + '°K'
-            : ''}
+      <div className="flex items-center space-x-4">
+        <AccessibilityControls />     {/* add */}
+        <span>
+          Weather:{' '}
+          <span className="text-blue-300">
+            {weatherData ? weatherData.name : 'Loading...'}
+            {weatherData?.main?.temp && ` ${weatherData.main.temp}°K`}
+          </span>
         </span>
       </div>
     </div>
