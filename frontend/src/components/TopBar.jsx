@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import AccessibilityControls from './AccessibilityControls';
+import ContrastToggle       from './ContrastToggle';
 import Translate from './Translate';
 
 function TopBar() 
@@ -33,17 +35,16 @@ function TopBar()
       <div>
         {time.toLocaleTimeString()}
       </div>
-      <div className="flex items-center space-x-6">
-        <Translate />
-        <div>
-          Weather:{" "}
+      <div className="flex items-center space-x-4">
+        <AccessibilityControls />     {/* text-size buttons */}
+        <ContrastToggle />          {/* high-contrast button */}
+        <span>
+          Weather:{' '}
           <span className="text-blue-300">
-            {weatherData ? weatherData.name : 'Loading...'}{" "}
-            {weatherData && weatherData.main ? 
-              weatherData.main.temp + '°K'
-              : ''}
+            {weatherData ? weatherData.name : 'Loading...'}
+            {weatherData?.main?.temp && ` ${weatherData.main.temp}°K`}
           </span>
-        </div>
+        </span>
       </div>
     </div>
   );
