@@ -1,3 +1,30 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+@layer base {
+    html.contrast-mode 
+    {
+      background-color: #000;
+      color: #fff;
+    }
+    html.contrast-mode .bg-base-100 
+    { 
+        background-color: #000 !important; 
+    }
+    html.contrast-mode .text-gray-600,
+    html.contrast-mode .text-gray-200,
+    html.contrast-mode .text-gray-400 
+    {
+      color: #fff !important;
+    }
+  
+    html.contrast-mode .btn-primary 
+    {
+      background-color: #0ff !important;
+      border-color: #0ff !important;
+      color: #000 !important;
+    }
+  
+  }
