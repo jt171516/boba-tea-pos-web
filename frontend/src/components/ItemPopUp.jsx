@@ -16,6 +16,21 @@ const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, updateSum}) => {
         };
     }, [isOpen]);
 
+    const initialCustomizations = item?.initialCustomizations || {};
+
+    const [selectedSize, setSelectedSize] = useState(initialCustomizations.size || '');
+    const [selectedIce, setSelectedIce] = useState(initialCustomizations.ice || '');
+    const [selectedSugar, setSelectedSugar] = useState(initialCustomizations.sugar || '');
+    const [selectedToppings, setSelectedToppings] = useState(initialCustomizations.toppings || []);
+
+    useEffect(() => {
+        const newCustoms = item?.initialCustomizations || {};
+        setSelectedSize(newCustoms.size || '');
+        setSelectedIce(newCustoms.ice || '');
+        setSelectedSugar(newCustoms.sugar || '');
+        setSelectedToppings(newCustoms.toppings || []);
+    }, [item]);
+
     if (!isOpen) return null;
 
     const topping = [
@@ -29,12 +44,6 @@ const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, updateSum}) => {
         { name: "Coffee Jelly", image: "https://images.squarespace-cdn.com/content/v1/61e8bb2a2cf8670534839093/e8308489-ff59-4351-95fb-06c01d0a1b38/Topping_CoffeeJelly.png?format=500w" },
         { name: "Ice Cream", image: "https://images.squarespace-cdn.com/content/v1/61e8bb2a2cf8670534839093/ee270494-a5e6-4080-96ae-3e21cccfa0d6/Topping_IceCream.png?format=500w" },
     ];
-
-    //state to keep track of selected toppings
-    const [selectedSize, setSelectedSize] = useState('');
-    const [selectedIce, setSelectedIce] = useState('');
-    const [selectedSugar, setSelectedSugar] = useState('');
-    const [selectedToppings, setSelectedToppings] = useState([]);
 
     //handle topping selection
     const handleToppingClick = (toppingName) => {
@@ -171,51 +180,51 @@ const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, updateSum}) => {
                 <div className="flex justify-between mt-4 space-x-8">
                     <div className="sizes">
                         <h3 className="text-lg font-bold mb-2">Size:</h3>
-                        <input className="join-item btn m-1" type="radio" name="size"  value="Small" onChange={(e) => setSelectedSize(e.target.value)} aria-label="Small" />
-                        <input className="join-item btn m-1" type="radio" name="size"  value="Medium" onChange={(e) => setSelectedSize(e.target.value)} aria-label="Medium" />
-                        <input className="join-item btn m-1" type="radio" name="size"  value="Large" onChange={(e) => setSelectedSize(e.target.value)} aria-label="Large" />
+                        <input className="join-item btn m-1" type="radio" name="size"  value="Small" checked={selectedSize === 'Small'} onChange={(e) => setSelectedSize(e.target.value)} aria-label="Small" />
+                        <input className="join-item btn m-1" type="radio" name="size"  value="Medium" checked={selectedSize === 'Medium'} onChange={(e) => setSelectedSize(e.target.value)} aria-label="Medium" />
+                        <input className="join-item btn m-1" type="radio" name="size"  value="Large" checked={selectedSize === 'Large'} onChange={(e) => setSelectedSize(e.target.value)} aria-label="Large" />
                     </div>
 
                     <div className="ice level">
                         <h3 className="text-lg font-bold mb-2">Ice Level:</h3>
-                        <input className="join-item btn m-1" type="radio" name="ice"  value="0%" onChange={(e) => setSelectedIce(e.target.value)} aria-label="0%" />
-                        <input className="join-item btn m-1" type="radio" name="ice"  value="25%" onChange={(e) => setSelectedIce(e.target.value)} aria-label="25%" />
-                        <input className="join-item btn m-1" type="radio" name="ice"  value="50%" onChange={(e) => setSelectedIce(e.target.value)} aria-label="50%" />
-                        <input className="join-item btn m-1" type="radio" name="ice"  value="75%" onChange={(e) => setSelectedIce(e.target.value)} aria-label="75%" />
-                        <input className="join-item btn m-1" type="radio" name="ice"  value="100%" onChange={(e) => setSelectedIce(e.target.value)} aria-label="100%" />
+                        <input className="join-item btn m-1" type="radio" name="ice"  value="0%" checked={selectedIce === '0%'} onChange={(e) => setSelectedIce(e.target.value)} aria-label="0%" />
+                        <input className="join-item btn m-1" type="radio" name="ice"  value="25%" checked={selectedIce === '25%'} onChange={(e) => setSelectedIce(e.target.value)} aria-label="25%" />
+                        <input className="join-item btn m-1" type="radio" name="ice"  value="50%" checked={selectedIce === '50%'} onChange={(e) => setSelectedIce(e.target.value)} aria-label="50%" />
+                        <input className="join-item btn m-1" type="radio" name="ice"  value="75%" checked={selectedIce === '75%'} onChange={(e) => setSelectedIce(e.target.value)} aria-label="75%" />
+                        <input className="join-item btn m-1" type="radio" name="ice"  value="100%" checked={selectedIce === '100%'} onChange={(e) => setSelectedIce(e.target.value)} aria-label="100%" />
                     </div>
 
                     <div className="sugar level"></div>
                     <div className="sugar level">
                         <h3 className="text-lg font-bold mb-2">Sugar Level:</h3>
-                        <input className="join-item btn m-1" type="radio" name="sugar" value="0%" onChange={(e) => setSelectedSugar(e.target.value)} aria-label="0%" />
-                        <input className="join-item btn m-1" type="radio" name="sugar" value="25%" onChange={(e) => setSelectedSugar(e.target.value)} aria-label="25%" />
-                        <input className="join-item btn m-1" type="radio" name="sugar" value="50%" onChange={(e) => setSelectedSugar(e.target.value)} aria-label="50%" />
-                        <input className="join-item btn m-1" type="radio" name="sugar" value="75%" onChange={(e) => setSelectedSugar(e.target.value)} aria-label="75%" />
-                        <input className="join-item btn m-1" type="radio" name="sugar" value="100%" onChange={(e) => setSelectedSugar(e.target.value)} aria-label="100%" />
+                        <input className="join-item btn m-1" type="radio" name="sugar" value="0%" checked={selectedSugar === '0%'} onChange={(e) => setSelectedSugar(e.target.value)} aria-label="0%" />
+                        <input className="join-item btn m-1" type="radio" name="sugar" value="25%" checked={selectedSugar === '25%'} onChange={(e) => setSelectedSugar(e.target.value)} aria-label="25%" />
+                        <input className="join-item btn m-1" type="radio" name="sugar" value="50%" checked={selectedSugar === '50%'} onChange={(e) => setSelectedSugar(e.target.value)} aria-label="50%" />
+                        <input className="join-item btn m-1" type="radio" name="sugar" value="75%" checked={selectedSugar === '75%'} onChange={(e) => setSelectedSugar(e.target.value)} aria-label="75%" />
+                        <input className="join-item btn m-1" type="radio" name="sugar" value="100%" checked={selectedSugar === '100%'} onChange={(e) => setSelectedSugar(e.target.value)} aria-label="100%" />
                     </div>
                 </div>
 
                 <div className = "mt-6">
                     <h3 className = "text-lg font-bold mb-2">Toppings:</h3>
                     <div className="grid grid-cols-3 gap-4">
-                        {topping.map((topping) => (
+                        {topping.map((t) => (
                             <div
-                                key={topping.name}
-                                className="relative cursor-pointer border rounded-lg p-2 flex flex-col items-center" 
-                                onClick={() => handleToppingClick(topping.name)}
+                                key={t.name}
+                                className={`relative cursor-pointer border rounded-lg p-2 flex flex-col items-center ${selectedToppings.includes(t.name) ? 'border-primary border-2' : ''}`} 
+                                onClick={() => handleToppingClick(t.name)}
                             >
                                 <img 
-                                    src={topping.image} 
-                                    alt={topping.name} 
+                                    src={t.image} 
+                                    alt={t.name} 
                                     className="w-full h-[200px] object-cover rounded" 
                                 />
 
-                                {selectedToppings.includes(topping.name) && (
-                                    <div className = "absolute inset-0 bg-white bg-opacity-50 rounded"></div>
+                                {selectedToppings.includes(t.name) && (
+                                    <div className = "absolute top-1 right-1 bg-primary text-primary-content rounded-full p-1">✓</div>
                                 )}
 
-                                <p className="text-sm mt-2">{topping.name}</p>
+                                <p className="text-sm mt-2">{t.name}</p>
                             </div>
                         ))}
                     </div>
