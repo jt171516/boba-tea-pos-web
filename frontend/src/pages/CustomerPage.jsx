@@ -254,24 +254,17 @@ function CustomerPage() {
     setSum((prevSum) => prevSum + itemPrice);
   };
 
-  // Modify handleItemClick to accept customizations
-  const handleItemClick = (item, customizations = null) => {
-    setSelectedItem({ ...item, initialCustomizations: customizations }); // Pass customizations with the item
-    setIsPopUpOpen(true);
   const updateOrderSummary = (item, toppings) => {
     setOrderSummary((prevSummary) => [
       ...prevSummary,
-      { ...item, toppings }, // Add the item with its toppings
+      { ...item, toppings },
     ]);
-    /*
-    setIsSummaryOpen(true);
-    */
+
   };
 
-  //function to handle when an ItemCard is clicked
-  const handleItemClick = (item) => {
-    setSelectedItem(item); //set the selected item
-    setIsPopUpOpen(true); //open the pop-up
+  const handleItemClick = (item, customizations = null) => {
+    setSelectedItem({ ...item, initialCustomizations: customizations }); 
+    setIsPopUpOpen(true);
   };
 
   const handleSubmitOrder = async () => {
