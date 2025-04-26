@@ -45,6 +45,7 @@ app.use(express.json());
 app.use(cors(corsOptions));
 app.use(helmet()); //security middleware to provide HTTPS headers
 app.use(morgan("dev")); //log all requests
+app.use(passport.initialize()); //initialize passport for authentication
 
 // Route test
 app.get("/", (req,res) => {
@@ -322,6 +323,14 @@ app.put("/api/orders/:id/payment", async (req, res) => {
 
 });
 
+// Function to check if employee is manager
+function isManager(req, res, next) {
+    if (!req.user.manager) {
+        return res.status(403).json({ error: "Access denied. Managers only." });
+    }
+    next();
+}
+
 // Initiate Google authentication
 app.get('/auth/google', (req, res, next) => {
     const redirectUrl = req.query.state || '/';
@@ -355,6 +364,11 @@ app.get('/auth/protected', passport.authenticate('jwt', {session: false }), (req
 app.get('/auth/logout', (req, res) => {
     const redirectUrl = req.query.state || '/';
     res.redirect(`${redirectUrl}?logout=true`);
+});
+
+// Check if manager
+app.get('/auth/manager', passport.authenticate('jwt', {session: false }), isManager, (req, res) => {
+    res.send(`Hello ${req.user.displayName}, you are a manager!`);
 });
 
 app.listen(PORT, () => {

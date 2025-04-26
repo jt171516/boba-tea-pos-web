@@ -51,7 +51,25 @@ const ManagerPage = () => {
       })
       .then((response) => {
         if (response.ok) {
-          setIsLoggedIn(true);
+          fetch(`${import.meta.env.VITE_APP_AUTH_URL}/manager`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
+          .then((response) => {
+            if (response.ok) {
+              setIsLoggedIn(true);
+            } 
+            else {
+              localStorage.removeItem("token");
+              setIsLoggedIn(false);
+              toast.error("You are not a manager. Please log in with a manager account.");
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching login status:", error);
+            setIsLoggedIn(false);
+          });
         } 
         else {
           setIsLoggedIn(false);

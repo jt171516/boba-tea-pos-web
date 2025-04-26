@@ -3,8 +3,19 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import dotenv from "dotenv";
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import jwt from "jsonwebtoken";
+import pg from "pg";
 
 dotenv.config();
+
+// set up PostgreSQL connection
+const { Pool } = pg;
+const pool = new Pool({
+    user: process.env.PSQL_USER,
+    host: process.env.PSQL_HOST,
+    database: process.env.PSQL_DATABASE,
+    password: process.env.PSQL_PASSWORD,
+    port: process.env.PSQL_PORT,
+});
 
 const jwtOptions = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -27,12 +38,28 @@ passport.use(new GoogleStrategy({
     scope: ["profile", "email"],
   },
   // Authentication is successful if the user is from TAMU
-  (accessToken, refreshToken, profile, done) => {
-    if (!profile._json.hd || profile._json.hd.toLowerCase() !== "tamu.edu") {
-      return done(null, false, { message: 'Only TAMU accounts are allowed.' });
+  async (accessToken, refreshToken, profile, done) => {
+
+    try {
+      const userEmail = profile.emails[0].value;
+
+      const { rows } = await pool.query(`SELECT * FROM employee WHERE email = $1`, [userEmail]);
+
+      if (rows.length === 0) {
+        return done(null, false, { message: 'Employee not found in database.' });
+      }
+
+      const user = {
+        id: rows[0].id,
+        email: rows[0].email,
+        name: rows[0].name,
+        manager: rows[0].manager,
+      };
+
+      return done(null, user);
     }
-    else {
-      return done(null, profile);
+    catch (error) {
+      return done(error, false);
     }
-   }
+  }
 ));
