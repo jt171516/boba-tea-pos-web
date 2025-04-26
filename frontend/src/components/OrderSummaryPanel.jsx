@@ -2,7 +2,7 @@ import React from 'react';
 
 const OrderSummaryPanel = ({ orderSummary, totalPrice, onClose, handleSubmitOrder}) => {
     return (
-        <div className="fixed top-8 right-0 h-auto max-h-[50vh] w-96 bg-white shadow-lg p-4 flex flex-col">
+        <div className="fixed top-12 right-0 h-auto max-h-[50vh] w-96 bg-base-100 shadow-lg p-4 flex flex-col">
             <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold">Order Summary</h2>
                 <button className="text-red-500 font-bold" onClick={onClose}>
