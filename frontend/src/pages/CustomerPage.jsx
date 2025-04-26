@@ -6,6 +6,9 @@ import TopBar from '../components/TopBar';
 import SideMenu from '../components/SideMenu';
 import ItemPopUp from '../components/ItemPopUp';
 import toast, { Toaster } from 'react-hot-toast'; 
+import OrderSummaryPanel from '../components/OrderSummaryPanel';
+import {  ShoppingCart } from 'lucide-react';
+
 
 // Format the category names
 function format(str) {
@@ -21,6 +24,8 @@ function CustomerPage() {
   const [selectedItem, setSelectedItem] = useState(null); //state to keep track of the selected item
   const [currentOrderId, setCurrentOrderId] = useState(null); 
   const [sum, setSum] = useState(0);
+  const [orderSummary, setOrderSummary] = useState([]); //state to keep track of the order summary
+  const [isSummaryOpen, setIsSummaryOpen] = useState(false); //state to keep track of the order summary pop-up
   const navigate = useNavigate(); //useNavigate hook to navigate to the payment page
   const recognitionRef = useRef(null);
   const [listening, setListening] = useState(false);
@@ -253,6 +258,20 @@ function CustomerPage() {
   const handleItemClick = (item, customizations = null) => {
     setSelectedItem({ ...item, initialCustomizations: customizations }); // Pass customizations with the item
     setIsPopUpOpen(true);
+  const updateOrderSummary = (item, toppings) => {
+    setOrderSummary((prevSummary) => [
+      ...prevSummary,
+      { ...item, toppings }, // Add the item with its toppings
+    ]);
+    /*
+    setIsSummaryOpen(true);
+    */
+  };
+
+  //function to handle when an ItemCard is clicked
+  const handleItemClick = (item) => {
+    setSelectedItem(item); //set the selected item
+    setIsPopUpOpen(true); //open the pop-up
   };
 
   const handleSubmitOrder = async () => {
@@ -311,6 +330,14 @@ function CustomerPage() {
             >
               {listening ? "🛑 Stop Voice" : "🎤 Start Voice"}
             </button>
+            <button onClick = {() => setIsSummaryOpen(true)} className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition duration-200 relative">
+              <ShoppingCart className = "w-6 h-6 text-gray-500"/>
+              {orderSummary.length > 0 && (
+                <span className = "absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {orderSummary.length}
+                </span>
+              )}
+            </button>
           </div>
 
           {/* Display filtered drinks using ItemCard */}
@@ -322,15 +349,6 @@ function CustomerPage() {
         </div>
       </div>
 
-      <div className="fixed bottom-4 right-4">
-        <button
-          className="btn btn-primary px-6 py-2 text-lg font-bold"
-          onClick={handleSubmitOrder}
-        >
-          Submit Order
-        </button>
-      </div>
-
       {isPopUpOpen && (
             <ItemPopUp
             isOpen={isPopUpOpen}
@@ -338,8 +356,18 @@ function CustomerPage() {
             item={selectedItem} // selectedItem now includes initialCustomizations
             currentOrderId = {currentOrderId}
             updateSum = {(itemPrice) => updateSum(itemPrice)}
+            updateOrderSummary = {(item, toppings) => updateOrderSummary(item, toppings)}
           />
         )}
+
+      {isSummaryOpen && (
+        <OrderSummaryPanel
+        orderSummary={orderSummary}
+        totalPrice={sum}
+        onClose={() => setIsSummaryOpen(false)}
+        handleSubmitOrder = {handleSubmitOrder}
+        />
+      )}
     </main>
   );
 }
