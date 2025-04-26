@@ -59,11 +59,12 @@ const ManagerPage = () => {
           .then((response) => {
             if (response.ok) {
               setIsLoggedIn(true);
+              toast.success("Logged in successfully.");
             } 
             else {
               localStorage.removeItem("token");
               setIsLoggedIn(false);
-              toast.error("You are not a manager. Please log in with a manager account.");
+              toast.error("Login failed. Must be manager.");
             }
           })
           .catch((error) => {
