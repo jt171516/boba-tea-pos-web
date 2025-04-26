@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 
-const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, updateSum}) => {
+const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, updateSum, updateOrderSummary}) => {
     useEffect(() => {
         if (isOpen) {
             //add the no-scroll class to the body when the popup is open
@@ -107,6 +107,7 @@ const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, updateSum}) => {
             });
 
             updateSum(itemData.price);
+            updateOrderSummary(itemData, selectedToppings);
 
             // Insert into ordersitemmodifierjunction table
             await fetch(`${import.meta.env.VITE_APP_API_URL}/ordersitemmodifierjunction`, {
