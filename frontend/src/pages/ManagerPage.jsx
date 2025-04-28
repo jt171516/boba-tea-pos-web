@@ -3,9 +3,10 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import ManagerSideMenu from "../components/ManagerSideMenu";
 import TopBar from "../components/TopBar";
 import { toast, Toaster } from "react-hot-toast";
+import sharetaele from '../img/sharetaele.png';
 
 const ManagerPage = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -59,7 +60,6 @@ const ManagerPage = () => {
           .then((response) => {
             if (response.ok) {
               setIsLoggedIn(true);
-              toast.success("Logged in successfully.");
             } 
             else {
               localStorage.removeItem("token");
@@ -101,7 +101,7 @@ const ManagerPage = () => {
         </>
       ) : (
         <div className="flex flex-col items-center justify-center h-screen bg-base-100">
-          <div><img src='/src/img/sharetaele.png' width="500"></img></div>
+          <div><img src={sharetaele} width="500" alt="Sharetaele"></img></div>
           <h1 className="text-4xl font-bold mb-4">Manager Portal</h1>
           <button onClick={handleLogin} className="btn btn-primary text-lg">
             Login

@@ -14,6 +14,7 @@ import ManagerInventoryPage from "./pages/ManagerInventoryPage";
 import ManagerEmployeesPage from "./pages/ManagerEmployeesPage";
 
 import WorkerPage from './pages/WorkerPage';
+import WorkerOrderingPage from './pages/WorkerOrderingPage';
 import MenuBoard from './pages/MenuBoard'; // Import MenuBoard
 
 function App() {
@@ -21,7 +22,6 @@ function App() {
     <div className="min-h-screen flex flex-col">
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/menu" element={<FoodMenu />} />
         <Route path="/customer/:category?" element={<CustomerPage />} />
         <Route path= "/payment/:orderId" element={<PaymentPage />} />
 
@@ -32,7 +32,9 @@ function App() {
           <Route path="employees" element={<ManagerEmployeesPage />} />
         </Route>
 
-        <Route path="/worker" element={<WorkerPage />} />  
+        <Route path="/worker" element={<WorkerPage />}>
+          <Route path="ordering/:category?" element={<WorkerOrderingPage />} />
+        </Route>  
         <Route path="/menu-board" element={<MenuBoard />} /> {/* Add MenuBoard route */}
       </Routes>
     </div>

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { replace, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 function PaymentPage() {
   const { orderId } = useParams(); // Get the orderId from the URL
   const [paymentMethod, setPaymentMethod] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handlePaymentSelection = async () => {
     if (!paymentMethod) {
@@ -32,7 +33,13 @@ function PaymentPage() {
   const handleFinishOrder = () => {
     // Navigate back to the HomePage
     alert("Order submitted successfully!");
-    navigate('/');
+    const fromPath = location.state?.from || '/';
+    if (fromPath.includes('/worker')) {
+      navigate('/worker/ordering', { replace: true });
+    }
+    else {
+      navigate('/', { replace: true });
+    }
   };
 
   return (
