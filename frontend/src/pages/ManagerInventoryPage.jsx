@@ -87,9 +87,7 @@ const ManagerInventoryPage = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-4 text-center">Inventory Management</h1>
-
-      <div className="mb-4">
+      <div className="mb-4 p-3">
         <input
           type="text"
           placeholder="Search by ID or Name"

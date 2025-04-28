@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import AddEmployee from "../components/AddEmployee"; // Import the AddEmployee component
+import AddEmployee from "../components/AddEmployee";
+import { Plus } from "lucide-react";
 
 const ManagerEmployeesPage = () => {
   const [employees, setEmployees] = useState([]);
@@ -106,9 +107,7 @@ const ManagerEmployeesPage = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-4 text-center">Employee Management</h1>
-
-      <div className="mb-4 flex items-center gap-4">
+      <div className="mb-4 flex items-center gap-4 p-3">
         <input
           type="text"
           placeholder="Search by ID or Name"
@@ -118,9 +117,9 @@ const ManagerEmployeesPage = () => {
         />
         <button
           onClick={handleAddEmployeeClick}
-          className="btn btn-primary px-6 py-3 text-lg"
+          className="btn btn-primary px-3 py-3 text-lg flex items-center gap-1"
         >
-          Add Employee
+          <Plus size={20} /> Add Employee
         </button>
       </div>
 

@@ -322,6 +322,53 @@ app.put("/api/orders/:id/payment", async (req, res) => {
 
 });
 
+// Route to fetch all orders
+app.get("/api/orders", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM orders ORDER BY timestamp DESC");
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Route to fetch orders within a specific date range
+app.get("/api/orders/date-range", async (req, res) => {
+  const { startDate, endDate } = req.query;
+
+  if (!startDate || !endDate) {
+    return res.status(400).json({ error: "Start date and end date are required" });
+  }
+
+  try {
+    const result = await pool.query(
+      "SELECT * FROM orders WHERE timestamp BETWEEN $1 AND $2 ORDER BY timestamp DESC",
+      [new Date(startDate), new Date(endDate)]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching orders by date range:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Route to fetch a single order by ID
+app.get("/api/orders/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query("SELECT * FROM orders WHERE id = $1", [id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error("Error fetching order by ID:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // Initiate Google authentication
 app.get('/auth/google', (req, res, next) => {
     const redirectUrl = req.query.state || '/';

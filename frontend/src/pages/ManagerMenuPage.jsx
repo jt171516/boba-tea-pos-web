@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AddMenuItem from "../components/AddMenuItem";
+import { Plus } from "lucide-react"; // Import the Plus icon
 
 const ManagerMenuPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -83,9 +84,7 @@ const ManagerMenuPage = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-4 text-center">Menu Item Management</h1>
-
-      <div className="mb-4 flex items-center gap-4">
+      <div className="mb-4 flex items-center gap-4 p-3">
         <input
           type="text"
           placeholder="Search by ID or Name"
@@ -98,9 +97,9 @@ const ManagerMenuPage = () => {
             setItemToEdit(null); // Clear the itemToEdit state for adding a new item
             setIsModalOpen(true);
           }}
-          className="btn btn-primary px-6 py-3 text-lg" // Increased padding and font size
+          className="btn btn-primary px-3 py-3 text-lg flex items-center gap-1"
         >
-          Add Item
+          <Plus size={20} /> Add Item
         </button>
       </div>
 
