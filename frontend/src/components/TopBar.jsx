@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AccessibilityControls from './AccessibilityControls';
-// import ContrastToggle       from './ContrastToggle';
+import ContrastToggle       from './ContrastToggle';
 import Translate from './Translate';
 
 function TopBar() 
@@ -38,7 +38,7 @@ function TopBar()
       <div className="flex items-center space-x-4">
         <Translate />
         <AccessibilityControls />     {/* text-size buttons */}
-        {/* <ContrastToggle />          high-contrast button */}
+        <ContrastToggle />          {/* high-contrast button */}
         <span>
           Weather:{' '}
           <span className="text-blue-300">
