@@ -11,6 +11,7 @@ import ManagerMenuPage from "./pages/ManagerMenuPage"
 import ManagerSalesPage from "./pages/ManagerSalesPage";
 import ManagerInventoryPage from "./pages/ManagerInventoryPage";
 import ManagerEmployeesPage from "./pages/ManagerEmployeesPage";
+import ManagerOverviewPage from "./pages/ManagerOverviewPage";
 
 import WorkerPage from './pages/WorkerPage';
 import MenuBoard from './pages/MenuBoard'; // Import MenuBoard
@@ -28,6 +29,7 @@ function App() {
           <Route path="menu" element={<ManagerMenuPage />}/>
           <Route path="inventory" element={<ManagerInventoryPage />} />
           <Route path="employees" element={<ManagerEmployeesPage />} />
+          <Route path="/manager/overview" element={<ManagerOverviewPage />} />
         </Route>
 
         <Route path="/worker" element={<WorkerPage />} />  
