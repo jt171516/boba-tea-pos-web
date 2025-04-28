@@ -2,9 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 function ManagerSideMenu() {
-    const handleLogout = () => {
-    const currentUrl = window.location.href;
-    window.location.href = `${import.meta.env.VITE_APP_AUTH_URL}/logout?state=${encodeURIComponent(currentUrl)}`;
+  const handleLogout = () => {
+  const currentUrl = window.location.href;
+  window.location.href = `${import.meta.env.VITE_APP_AUTH_URL}/logout?state=${encodeURIComponent(currentUrl)}`;
   };
 
   return (
