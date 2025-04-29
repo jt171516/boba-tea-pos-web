@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ItemCard from '../components/ItemCard';
-import TopBar from '../components/TopBar';
-import SideMenu from '../components/SideMenu';
 import ItemPopUp from '../components/ItemPopUp';
+import TopBar from '../components/TopBar';
+import WorkerSideMenu from '../components/WorkerSideMenu';
 import toast, { Toaster } from 'react-hot-toast'; 
 import OrderSummaryPanel from '../components/OrderSummaryPanel';
 import {  ShoppingCart } from 'lucide-react';
@@ -16,7 +16,7 @@ function format(str) {
   return str.replace(/-/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 }
 
-function CustomerPage() {
+function WorkerOrderingPage() {
   const [items, setItems] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const { category } = useParams();
@@ -288,7 +288,7 @@ function CustomerPage() {
         }),
       });
 
-      navigate(`/payment/${currentOrderId}`, { replace: true, state: {from: location.pathname} });
+     navigate(`/payment/${currentOrderId}` , { replace: true, state: { from: location.pathname } });
 
     } catch (error) {
       console.error('Error submitting order:', error);
@@ -298,12 +298,9 @@ function CustomerPage() {
 
   return (
     <main className="min-h-screen flex flex-col">
-      <TopBar />
       <Toaster /> {/* Ensure Toaster is included */}
       <div className="flex flex-grow">
-        <SideMenu />
         <div className="flex flex-col flex-grow bg-base-100 p-4">
-
           {/* Show current drinks category */}
           <h1 className="text-4xl font-bold mb-6 text-center">
             {category && category.toLowerCase() !== 'all-drinks' ? `${format(category)} Menu` : 'Menu'}
@@ -366,4 +363,4 @@ function CustomerPage() {
   );
 }
 
-export default CustomerPage;
+export default WorkerOrderingPage;

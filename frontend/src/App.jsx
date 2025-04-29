@@ -14,6 +14,7 @@ import ManagerEmployeesPage from "./pages/ManagerEmployeesPage";
 import ManagerOverviewPage from "./pages/ManagerOverviewPage";
 
 import WorkerPage from './pages/WorkerPage';
+import WorkerOrderingPage from './pages/WorkerOrderingPage';
 import MenuBoard from './pages/MenuBoard'; // Import MenuBoard
 
 function App() {
@@ -32,7 +33,9 @@ function App() {
           <Route path="/manager/overview" element={<ManagerOverviewPage />} />
         </Route>
 
-        <Route path="/worker" element={<WorkerPage />} />  
+        <Route path="/worker" element={<WorkerPage />}>
+          <Route path="ordering/:category?" element={<WorkerOrderingPage />} />
+        </Route>  
         <Route path="/menu-board" element={<MenuBoard />} /> {/* Add MenuBoard route */}
       </Routes>
     </div>

@@ -3,11 +3,12 @@ import { Link, useLocation } from "react-router-dom";
 import { Archive, DollarSign, List, Signpost, User } from "lucide-react";
 
 function ManagerSideMenu() {
-  const location = useLocation(); // Get the current route
 
+  const location = useLocation(); // Get the current route
   const handleLogout = () => {
-    const currentUrl = window.location.href;
-    window.location.href = `${import.meta.env.VITE_APP_AUTH_URL}/logout?state=${encodeURIComponent(currentUrl)}`;
+  const currentUrl = window.location.href;
+  window.location.href = `${import.meta.env.VITE_APP_AUTH_URL}/logout?state=${encodeURIComponent(currentUrl)}`;
+
   };
 
   const categories = [
