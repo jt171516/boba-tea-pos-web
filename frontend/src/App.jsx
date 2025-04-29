@@ -3,7 +3,6 @@ import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 
 import HomePage from './pages/HomePage';
-import FoodMenu from './pages/FoodMenu';
 import CustomerPage from './pages/CustomerPage';
 import PaymentPage from './pages/PaymentPage';
 
@@ -12,6 +11,7 @@ import ManagerMenuPage from "./pages/ManagerMenuPage"
 import ManagerSalesPage from "./pages/ManagerSalesPage";
 import ManagerInventoryPage from "./pages/ManagerInventoryPage";
 import ManagerEmployeesPage from "./pages/ManagerEmployeesPage";
+import ManagerOverviewPage from "./pages/ManagerOverviewPage";
 
 import WorkerPage from './pages/WorkerPage';
 import WorkerOrderingPage from './pages/WorkerOrderingPage';
@@ -30,6 +30,7 @@ function App() {
           <Route path="menu" element={<ManagerMenuPage />}/>
           <Route path="inventory" element={<ManagerInventoryPage />} />
           <Route path="employees" element={<ManagerEmployeesPage />} />
+          <Route path="/manager/overview" element={<ManagerOverviewPage />} />
         </Route>
 
         <Route path="/worker" element={<WorkerPage />}>
