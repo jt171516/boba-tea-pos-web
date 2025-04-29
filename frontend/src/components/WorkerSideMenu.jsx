@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Coffee, CupSoda, GlassWater, Citrus, List } from 'lucide-react';
+import { Coffee, CupSoda, GlassWater, Citrus, List, AppWindow } from 'lucide-react';
 
 function WorkerSideMenu() 
 {
@@ -41,6 +41,13 @@ function WorkerSideMenu()
             <span>{category.name}</span>
           </Link>
         ))}
+        <Link
+          to="/manager/overview"
+          className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-700 transition duration-200 ease-in-out"
+        >
+          <AppWindow/>
+          <span>Manager Page</span>
+        </Link>
       </nav>
       <div className="mt-auto mx-auto">
         <button
