@@ -25,9 +25,9 @@ const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, updateSum, updateOrd
 
     useEffect(() => {
         const newCustoms = item?.initialCustomizations || {};
-        setSelectedSize(newCustoms.size || '');
-        setSelectedIce(newCustoms.ice || '');
-        setSelectedSugar(newCustoms.sugar || '');
+        setSelectedSize(newCustoms.size || 'Large');
+        setSelectedIce(newCustoms.ice || '100%');
+        setSelectedSugar(newCustoms.sugar || '100%');
         setSelectedToppings(newCustoms.toppings || []);
     }, [item]);
 
