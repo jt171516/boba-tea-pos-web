@@ -7,9 +7,9 @@ const ManagerSalesPage = () => {
   const [customStartDate, setCustomStartDate] = useState("");
   const [customEndDate, setCustomEndDate] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortField, setSortField] = useState("id"); // Default sort field
-  const [sortOrder, setSortOrder] = useState("asc"); // Default sort order
-  const [itemsPerPage, setItemsPerPage] = useState(100); // Default items per page
+  const [sortField, setSortField] = useState("id");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [itemsPerPage, setItemsPerPage] = useState(100);
 
   useEffect(() => {
     const fetchSalesData = async () => {
@@ -20,7 +20,7 @@ const ManagerSalesPage = () => {
         }
         const data = await response.json();
         setSalesData(data);
-        setFilteredSales(data); // Initialize with all orders data
+        setFilteredSales(data);
       } catch (error) {
         console.error("Error fetching orders data:", error);
       }
@@ -52,11 +52,11 @@ const ManagerSalesPage = () => {
         (sale) => new Date(sale.timestamp) >= startDate && new Date(sale.timestamp) <= endDate
       );
     } else if (filterType === "allTime") {
-      filtered = salesData; // No filtering, show all sales
+      filtered = salesData;
     }
 
     setFilteredSales(filtered);
-    setCurrentPage(1); // Reset to the first page when filters change
+    setCurrentPage(1);
   };
 
   useEffect(() => {
@@ -98,6 +98,25 @@ const ManagerSalesPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
+  };
+
+  // Handlers for new buttons
+  const handleXReport = () => {
+    console.log("Generating X Report...");
+    alert("Filler");
+    // Add logic to generate and download the X Report
+  };
+
+  const handleZReport = () => {
+    console.log("Generating Z Report...");
+    alert("Filler");
+    // Add logic to generate and download the Z Report
+  };
+
+  const handleGenerateProductUsageChart = () => {
+    console.log("Generating Product Usage Chart...");
+    alert("Filler");
+    // Add logic to generate and display the product usage chart
   };
 
   return (
@@ -147,6 +166,19 @@ const ManagerSalesPage = () => {
             className="input input-bordered w-20"
           />
         </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="mb-4 flex gap-4">
+        <button onClick={handleXReport} className="btn btn-primary">
+          Generate X Report
+        </button>
+        <button onClick={handleZReport} className="btn btn-secondary">
+          Generate Z Report
+        </button>
+        <button onClick={handleGenerateProductUsageChart} className="btn btn-accent">
+          Generate Product Usage Chart
+        </button>
       </div>
 
       {/* Sales Table */}

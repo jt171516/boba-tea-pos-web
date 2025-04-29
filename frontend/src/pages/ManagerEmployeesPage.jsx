@@ -45,13 +45,12 @@ const ManagerEmployeesPage = () => {
 
   const handleAddEmployee = (newEmployee) => {
     console.log("Adding employee:", newEmployee);
-    const updatedEmployees = employees.map((employee) =>
-      employee.id === newEmployee.id ? newEmployee : employee
-    );
 
-    if (!employees.some((employee) => employee.id === newEmployee.id)) {
-      updatedEmployees.push(newEmployee);
-    }
+    const updatedEmployees = employees.some((employee) => employee.id === newEmployee.id)
+      ? employees.map((employee) =>
+          employee.id === newEmployee.id ? newEmployee : employee
+        )
+      : [...employees, newEmployee]; // Add new employee if it doesn't exist
 
     setEmployees(updatedEmployees);
     setFilteredEmployees(updatedEmployees);
@@ -87,21 +86,8 @@ const ManagerEmployeesPage = () => {
   };
 
   const handleAddEmployeeClick = () => {
-    // Calculate the lowest possible nonzero ID
-    const existingIds = employees.map((employee) => employee.id);
-    let newId = 1;
-    while (existingIds.includes(newId)) {
-      newId++;
-    }
-
-    // Set the initial data for the modal with the calculated ID
-    setEmployeeToEdit({
-      id: newId,
-      name: "",
-      manager: false,
-      password: "",
-    });
-
+    // Set the modal to "Add Employee" mode by clearing initialData
+    setEmployeeToEdit(null);
     setIsModalOpen(true);
   };
 

@@ -178,6 +178,73 @@ app.get("/api/employees", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+// Route to add a new employee
+app.post("/api/employees", async (req, res) => {
+  const { id, name, manager, password } = req.body;
+
+  try {
+    const query = `
+      INSERT INTO employee (id, name, manager, password)
+      VALUES ($1, $2, $3, $4)
+      RETURNING *;
+    `;
+    const values = [id, name, manager, password];
+    const result = await pool.query(query, values);
+
+    res.status(201).json(result.rows[0]); // Return the newly added employee
+  } catch (error) {
+    console.error("Error adding employee:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Route to edit an employee
+app.put("/api/employees/:id", async (req, res) => {
+  const { id } = req.params;
+  const { name, manager, password } = req.body;
+
+  try {
+    const query = `
+      UPDATE employee
+      SET name = $1, manager = $2, password = $3
+      WHERE id = $4
+      RETURNING *;
+    `;
+    const values = [name, manager, password, id];
+    const result = await pool.query(query, values);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Employee not found" });
+    }
+
+    res.status(200).json(result.rows[0]); // Return the updated employee
+  } catch (error) {
+    console.error("Error editing employee:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Route to delete an employee
+app.delete("/api/employees/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const query = "DELETE FROM employee WHERE id = $1 RETURNING *;";
+    const values = [id];
+    const result = await pool.query(query, values);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Employee not found" });
+    }
+
+    res.status(200).json({ message: "Employee deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting employee:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // Route to get item id by name
 app.get("/api/item/:name", async (req, res) => {
     const itemName = req.params.name;
