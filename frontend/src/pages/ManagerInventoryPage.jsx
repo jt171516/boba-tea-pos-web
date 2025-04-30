@@ -87,9 +87,7 @@ const ManagerInventoryPage = () => {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-4 text-center">Inventory Management</h1>
-
-      <div className="mb-4">
+      <div className="mb-4 p-3">
         <input
           type="text"
           placeholder="Search by ID or Name"
@@ -110,7 +108,10 @@ const ManagerInventoryPage = () => {
         </thead>
         <tbody>
           {filteredInventory.map((item) => (
-            <tr key={item.id}>
+            <tr
+              key={item.id}
+              className={item.qty < 10 ? "bg-red-100 text-black font-bold" : ""} // Highlight low inventory items
+            >
               <td className="border border-gray-300 px-4 py-2 text-center">{item.id}</td>
               <td className="border border-gray-300 px-4 py-2 text-center">{item.name}</td>
               <td className="border border-gray-300 px-4 py-2 text-center">

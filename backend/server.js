@@ -179,6 +179,73 @@ app.get("/api/employees", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+// Route to add a new employee
+app.post("/api/employees", async (req, res) => {
+  const { id, name, manager, password } = req.body;
+
+  try {
+    const query = `
+      INSERT INTO employee (id, name, manager, password)
+      VALUES ($1, $2, $3, $4)
+      RETURNING *;
+    `;
+    const values = [id, name, manager, password];
+    const result = await pool.query(query, values);
+
+    res.status(201).json(result.rows[0]); // Return the newly added employee
+  } catch (error) {
+    console.error("Error adding employee:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Route to edit an employee
+app.put("/api/employees/:id", async (req, res) => {
+  const { id } = req.params;
+  const { name, manager, password } = req.body;
+
+  try {
+    const query = `
+      UPDATE employee
+      SET name = $1, manager = $2, password = $3
+      WHERE id = $4
+      RETURNING *;
+    `;
+    const values = [name, manager, password, id];
+    const result = await pool.query(query, values);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Employee not found" });
+    }
+
+    res.status(200).json(result.rows[0]); // Return the updated employee
+  } catch (error) {
+    console.error("Error editing employee:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Route to delete an employee
+app.delete("/api/employees/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const query = "DELETE FROM employee WHERE id = $1 RETURNING *;";
+    const values = [id];
+    const result = await pool.query(query, values);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Employee not found" });
+    }
+
+    res.status(200).json({ message: "Employee deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting employee:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // Route to get item id by name
 app.get("/api/item/:name", async (req, res) => {
     const itemName = req.params.name;
@@ -321,6 +388,53 @@ app.put("/api/orders/:id/payment", async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 
+});
+
+// Route to fetch all orders
+app.get("/api/orders", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM orders ORDER BY timestamp DESC");
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching orders:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Route to fetch orders within a specific date range
+app.get("/api/orders/date-range", async (req, res) => {
+  const { startDate, endDate } = req.query;
+
+  if (!startDate || !endDate) {
+    return res.status(400).json({ error: "Start date and end date are required" });
+  }
+
+  try {
+    const result = await pool.query(
+      "SELECT * FROM orders WHERE timestamp BETWEEN $1 AND $2 ORDER BY timestamp DESC",
+      [new Date(startDate), new Date(endDate)]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching orders by date range:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+// Route to fetch a single order by ID
+app.get("/api/orders/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query("SELECT * FROM orders WHERE id = $1", [id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error("Error fetching order by ID:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 // Function to check if employee is manager
