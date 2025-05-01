@@ -295,9 +295,20 @@ app.put("/api/orders/:id", async (req, res) => {
     const {id} = req.params;
     const {totalprice, payment, is_closed} = req.body;
     try {
+      
+        const itemsResult = await pool.query(
+            `SELECT i.name 
+             FROM ordersitemjunction oij
+             JOIN item i ON oij.itemid = i.id
+             WHERE oij.orderid = $1`,
+            [id]
+        );
+
+        const itemNames = itemsResult.rows.map(row => row.name).join(", ");
+
         await pool.query(
-            "UPDATE orders SET totalprice = $1, timestamp = $2, payment = $3, is_closed = $4 WHERE id = $5",
-            [totalprice, new Date().toISOString(), payment, is_closed, id]
+            "UPDATE orders SET name = $1, totalprice = $2, timestamp = $3, payment = $4, is_closed = $5 WHERE id = $6",
+            [itemNames, totalprice, new Date().toISOString(), payment, is_closed, id]
         );
         res.status(200).json({ message: "Order submitted successfully" });
     } catch (error) {
@@ -388,6 +399,25 @@ app.put("/api/orders/:id/payment", async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 
+});
+
+// Route to delete an item from an order
+app.delete("/api/orderItem/:orderItemId", async (req, res) => {
+    const { orderItemId } = req.params;
+
+    try {
+        // Delete from ordersitemjunction
+        const result = await pool.query("DELETE FROM ordersitemjunction WHERE orderitemid = $1 RETURNING *", [orderItemId]);
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: "Order item not found" });
+        }
+
+        res.status(200).json({ message: "Order item removed successfully" });
+    } catch (error) {
+        console.error("Error deleting order item:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
 
 // Route to fetch all orders

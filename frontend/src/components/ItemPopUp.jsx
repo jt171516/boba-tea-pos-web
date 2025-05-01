@@ -59,11 +59,80 @@ const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, addItemToOrderAPI })
     }
 
     const handleAddToOrder = async () => {
-        // Basic validation within popup
-        if (!selectedSize || !selectedIce || !selectedSugar) {
-            toast.error('Please make sure size, ice level, and sugar level are all selected.');
-            return;
-        }
+        try {
+            if (!selectedSize || !selectedIce || !selectedSugar) {
+                alert('Please make sure size, ice level, and sugar level are all selected.');
+                return;
+            }
+            // Preprocess ice and sugar levels to remove the '%' symbol and convert to integers
+            const processedSize = selectedSize == 'Small' ? 'S':
+                                  selectedSize == 'Medium' ? 'M' :
+                                  selectedSize == 'Large' ? 'L' : '';
+
+            const processedIce = parseInt(selectedIce.replace('%', ''), 10);
+            const processedSugar = parseInt(selectedSugar.replace('%', ''), 10);
+
+            // Get the item id by item name
+            const itemResponse = await fetch (`${import.meta.env.VITE_APP_API_URL}/item/${item.name}`);
+            if (!itemResponse.ok) {
+                throw new Error('Failed to fetch item ID');
+            }
+            const itemData = await itemResponse.json();
+
+            console.log('Item name:', item.name);
+            //Add the orderid and itemid to the ordersitemjunction
+            const orderItemResponse = await fetch(`${import.meta.env.VITE_APP_API_URL}/orderItemId`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    orderId: currentOrderId,
+                    itemId: itemData.id,
+                    itemName: item.name,
+                }),
+            });
+            if (!orderItemResponse.ok) {
+                throw new Error('Failed to create orderItemId');
+            }
+            const {orderItemId} = await orderItemResponse.json();
+            
+            // Get the modifiers
+            const modifiersResponse = await fetch(`${import.meta.env.VITE_APP_API_URL}/modifiers`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    size: processedSize,
+                    sugar: processedSugar,
+                    ice: processedIce,
+                    toppings: selectedToppings,
+                }),
+            });
+
+            if (!modifiersResponse.ok) {
+                throw new Error('Failed to fetch modifiers');
+            }
+            const modifiersData = await modifiersResponse.json();
+
+            console.log('Modifiers Data:', modifiersData);
+
+            console.log('Payload for /api/ordersitemmodifierjunction:', {
+                orderItemId,
+                modifiers_id: modifiersData.map((modifier) => modifier.id),
+            });
+
+            updateSum(itemData.price);
+            updateOrderSummary(itemData, selectedToppings, orderItemId);
+
+            // Insert into ordersitemmodifierjunction table
+            await fetch(`${import.meta.env.VITE_APP_API_URL}/ordersitemmodifierjunction`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    orderItemId,
+                    modifiers: modifiersData.map(modifier => modifier.id),
+                }),
+            });
+
+            alert(`Item added successfully to order!`);
 
         // Call the passed-in API function
         const success = await addItemToOrderAPI(
