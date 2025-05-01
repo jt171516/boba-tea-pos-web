@@ -1,9 +1,21 @@
 import React from 'react'
 
 export default function ItemCard({ item, onClick }) {
+  const handleEnter = (e) => {
+    if (e.key === 'Enter') {
+      onClick();
+    }
+  };
+
   return (
     <div className="card z-0 w-80 h-80 bg-base-300 m-4 transition duration-300 ease-in-out hover: hover:scale-105"
-    onClick={onClick}>
+    role ="button"
+    onClick={onClick}
+    onKeyDown={handleEnter}
+    tabIndex={0}
+    aria-label = {item.name}
+    data-speak-text={item.name}
+    >
       <figure>
         <img
           src={item?.image || "https://s3-media0.fl.yelpcdn.com/bphoto/GBAD5WodnuFXpi3Q3CnQGw/348s.jpg"}
