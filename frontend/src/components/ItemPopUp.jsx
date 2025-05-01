@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import toast from 'react-hot-toast'; // Import toast
 
-// Receive addItemToOrderAPI prop, remove updateSum and updateOrderSummary
 const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, addItemToOrderAPI }) => {
     useEffect(() => {
         if (isOpen) {
@@ -119,9 +118,6 @@ const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, addItemToOrderAPI })
                 modifiers_id: modifiersData.map((modifier) => modifier.id),
             });
 
-            updateSum(itemData.price);
-            updateOrderSummary(itemData, selectedToppings, orderItemId);
-
             // Insert into ordersitemmodifierjunction table
             await fetch(`${import.meta.env.VITE_APP_API_URL}/ordersitemmodifierjunction`, {
                 method: 'POST',
@@ -134,21 +130,26 @@ const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, addItemToOrderAPI })
 
             alert(`Item added successfully to order!`);
 
-        // Call the passed-in API function
-        const success = await addItemToOrderAPI(
-            item, // Pass the whole item object
-            selectedSize,
-            selectedIce,
-            selectedSugar,
-            selectedToppings
-        );
+            // Call the passed-in API function
+            const success = await addItemToOrderAPI(
+                item, // Pass the whole item object
+                selectedSize,
+                selectedIce,
+                selectedSugar,
+                selectedToppings
+            );
 
-        // Close popup only if adding was successful
-        if (success) {
-            onClose();
+            // Close popup only if adding was successful
+            if (success) {
+                onClose();
+            }
+            // Feedback (success/error) is handled within addItemToOrderAPI
+        }   
+        catch (error) {
+            console.error('Error adding item to order:', error);
+            toast.error('Failed to add item to order. Please try again.');
         }
-        // Feedback (success/error) is handled within addItemToOrderAPI
-    }
+    };
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
