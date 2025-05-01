@@ -295,9 +295,20 @@ app.put("/api/orders/:id", async (req, res) => {
     const {id} = req.params;
     const {totalprice, payment, is_closed} = req.body;
     try {
+      
+        const itemsResult = await pool.query(
+            `SELECT i.name 
+             FROM ordersitemjunction oij
+             JOIN item i ON oij.itemid = i.id
+             WHERE oij.orderid = $1`,
+            [id]
+        );
+
+        const itemNames = itemsResult.rows.map(row => row.name).join(", ");
+
         await pool.query(
-            "UPDATE orders SET totalprice = $1, timestamp = $2, payment = $3, is_closed = $4 WHERE id = $5",
-            [totalprice, new Date().toISOString(), payment, is_closed, id]
+            "UPDATE orders SET name = $1, totalprice = $2, timestamp = $3, payment = $4, is_closed = $5 WHERE id = $6",
+            [itemNames, totalprice, new Date().toISOString(), payment, is_closed, id]
         );
         res.status(200).json({ message: "Order submitted successfully" });
     } catch (error) {
