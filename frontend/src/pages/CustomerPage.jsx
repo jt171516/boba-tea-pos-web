@@ -411,7 +411,7 @@ function CustomerPage() {
         body: JSON.stringify({
           totalprice: sum,
           payment: "Pending",
-          is_closed: true,
+          // is_closed: true,
         }),
       });
 

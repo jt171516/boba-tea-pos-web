@@ -547,7 +547,6 @@ app.get("/api/x-report", async (req, res) => {
                 COUNT(CASE WHEN payment = 'card' THEN 1 END) AS card_payments 
             FROM orders 
             WHERE DATE(timestamp) = CURRENT_DATE 
-              AND is_closed = FALSE 
             GROUP BY hour 
             ORDER BY hour;
         `);
