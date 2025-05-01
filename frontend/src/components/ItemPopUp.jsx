@@ -116,7 +116,7 @@ const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, updateSum, updateOrd
             });
 
             updateSum(itemData.price);
-            updateOrderSummary(itemData, selectedToppings);
+            updateOrderSummary(itemData, selectedToppings, orderItemId);
 
             // Insert into ordersitemmodifierjunction table
             await fetch(`${import.meta.env.VITE_APP_API_URL}/ordersitemmodifierjunction`, {

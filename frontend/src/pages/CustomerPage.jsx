@@ -255,10 +255,10 @@ function CustomerPage() {
     setSum((prevSum) => prevSum + itemPrice);
   };
 
-  const updateOrderSummary = (item, toppings) => {
+  const updateOrderSummary = (item, toppings, orderItemId) => {
     setOrderSummary((prevSummary) => [
       ...prevSummary,
-      { ...item, toppings },
+      { ...item, toppings, orderItemId},
     ]);
 
   };
@@ -350,7 +350,7 @@ function CustomerPage() {
             item={selectedItem} // selectedItem now includes initialCustomizations
             currentOrderId = {currentOrderId}
             updateSum = {(itemPrice) => updateSum(itemPrice)}
-            updateOrderSummary = {(item, toppings) => updateOrderSummary(item, toppings)}
+            updateOrderSummary = {(item, toppings, orderItemId) => updateOrderSummary(item, toppings, orderItemId)}
           />
         )}
 
@@ -360,6 +360,8 @@ function CustomerPage() {
         totalPrice={sum}
         onClose={() => setIsSummaryOpen(false)}
         handleSubmitOrder = {handleSubmitOrder}
+        setOrderSummary = {setOrderSummary}
+        setSum = {setSum}
         />
       )}
     </main>

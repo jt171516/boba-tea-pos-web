@@ -390,6 +390,25 @@ app.put("/api/orders/:id/payment", async (req, res) => {
 
 });
 
+// Route to delete an item from an order
+app.delete("/api/orderItem/:orderItemId", async (req, res) => {
+    const { orderItemId } = req.params;
+
+    try {
+        // Delete from ordersitemjunction
+        const result = await pool.query("DELETE FROM ordersitemjunction WHERE orderitemid = $1 RETURNING *", [orderItemId]);
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: "Order item not found" });
+        }
+
+        res.status(200).json({ message: "Order item removed successfully" });
+    } catch (error) {
+        console.error("Error deleting order item:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
 // Route to fetch all orders
 app.get("/api/orders", async (req, res) => {
   try {
