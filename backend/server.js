@@ -572,7 +572,6 @@ app.get("/api/z-report", async (req, res) => {
             FROM orders o 
             LEFT JOIN ordersitemjunction oj ON o.id = oj.orderid 
             WHERE DATE(o.timestamp) = CURRENT_DATE 
-              AND o.is_closed = false;
         `);
 
         res.json(result.rows[0]);
