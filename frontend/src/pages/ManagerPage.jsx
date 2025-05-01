@@ -60,7 +60,7 @@ const ManagerPage = () => {
           .then((response) => {
             if (response.ok) {
               setIsLoggedIn(true);
-              if (!location.pathname.match("/manager")) {
+              if (location.pathname === "/manager" || location.pathname === "/manager/") {
                 navigate("/manager/overview", { replace: true });
               }
             } 
