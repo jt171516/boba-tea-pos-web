@@ -142,6 +142,24 @@ app.get("/api/inventory", async (req, res) => {
     }
 });
 
+// Route to fetch all inventory items
+app.get("/api/inventory-usage", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        id AS inventory_id,
+        name AS inventory_name,
+        qty AS quantity
+      FROM inventory
+      ORDER BY name ASC;
+    `);
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching inventory items:", error);
+    res.status(500).json({ error: "Failed to fetch inventory items" });
+  }
+});
 
 // Route to edit inventory item quantity
 app.put("/api/inventory/:id/quantity", async (req, res) => {
@@ -513,6 +531,139 @@ app.get('/auth/logout', (req, res) => {
 // Check if manager
 app.get('/auth/manager', passport.authenticate('jwt', {session: false }), isManager, (req, res) => {
     res.send(`Hello ${req.user.displayName}, you are a manager!`);
+});
+
+// X Report: Fetch hourly sales data for the current day
+app.get("/api/x-report", async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT 
+                EXTRACT(HOUR FROM timestamp) AS hour, 
+                COUNT(DISTINCT id) AS total_orders, 
+                COALESCE(SUM(CASE WHEN totalprice > 0 THEN totalprice ELSE 0 END), 0) AS total_sales, 
+                COALESCE(SUM(CASE WHEN totalprice < 0 THEN -totalprice ELSE 0 END), 0) AS total_returns, 
+                COUNT(*) AS total_items, 
+                COUNT(CASE WHEN payment = 'cash' THEN 1 END) AS cash_payments, 
+                COUNT(CASE WHEN payment = 'card' THEN 1 END) AS card_payments 
+            FROM orders 
+            WHERE DATE(timestamp) = CURRENT_DATE 
+              AND is_closed = FALSE 
+            GROUP BY hour 
+            ORDER BY hour;
+        `);
+
+        res.json(result.rows);
+    } catch (error) {
+        console.error("Error fetching X Report:", error);
+        res.status(500).json({ error: "Failed to fetch X Report" });
+    }
+});
+
+// Z Report: Fetch cumulative sales data with detailed breakdown
+app.get("/api/z-report", async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT 
+                COALESCE(SUM(o.totalprice), 0) AS total_sales, 
+                COALESCE(SUM(CASE WHEN o.payment = 'cash' THEN o.totalprice ELSE 0 END), 0) AS cash_total, 
+                COALESCE(SUM(CASE WHEN o.payment = 'card' THEN o.totalprice ELSE 0 END), 0) AS card_total, 
+                COUNT(CASE WHEN o.payment = 'cash' THEN 1 END) AS cash_count, 
+                COUNT(CASE WHEN o.payment = 'card' THEN 1 END) AS card_count, 
+                COUNT(oj.itemid) AS total_items 
+            FROM orders o 
+            LEFT JOIN ordersitemjunction oj ON o.id = oj.orderid 
+            WHERE DATE(o.timestamp) = CURRENT_DATE 
+              AND o.is_closed = false;
+        `);
+
+        res.json(result.rows[0]);
+    } catch (error) {
+        console.error("Error fetching Z Report:", error);
+        res.status(500).json({ error: "Failed to fetch Z Report" });
+    }
+});
+
+// Product Usage Report: Fetch product usage data within a specific time span
+app.get("/api/product-usage", async (req, res) => {
+  const { startDate, endDate } = req.query;
+
+  if (!startDate || !endDate) {
+    return res.status(400).json({ error: "Start date and end date are required" });
+  }
+
+  try {
+    const result = await pool.query(`
+      SELECT 
+        product_id, 
+        product_name, 
+        SUM(quantity) AS total_quantity
+      FROM order_items
+      WHERE timestamp BETWEEN $1 AND $2
+      GROUP BY product_id, product_name
+      ORDER BY total_quantity DESC;
+    `, [new Date(startDate), new Date(endDate)]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "No product usage data found for the specified time span" });
+    }
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching Product Usage Report:", error);
+    res.status(500).json({ error: "Failed to fetch Product Usage Report" });
+  }
+});
+
+// Product Usage Report: Fetch usage data for a specific inventory item over time
+app.get("/api/product-usage/:itemId", async (req, res) => {
+  const { itemId } = req.params;
+
+  try {
+    const result = await pool.query(`
+      SELECT 
+        DATE(o.timestamp) AS usage_date,
+        SUM(oj.qty) AS total_quantity_used
+      FROM orders o
+      JOIN ordersitemjunction oj ON o.id = oj.orderid
+      WHERE oj.itemid = $1
+      GROUP BY usage_date
+      ORDER BY usage_date ASC;
+    `, [itemId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "No usage data found for the specified item" });
+    }
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching Product Usage Report:", error);
+    res.status(500).json({ error: "Failed to fetch Product Usage Report" });
+  }
+});
+
+// Inventory Usage Report: Fetch inventory usage data
+app.get("/api/inventory-usage", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        inventory.name AS inventory_name,
+        SUM(oi.quantity) AS inventory_count
+      FROM inventory
+      JOIN iteminventoryjunction ii ON inventory.id = ii.inventoryid
+      JOIN ordersitemjunction oi ON ii.itemid = oi.itemid
+      GROUP BY inventory.name
+      ORDER BY inventory.name;
+    `);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "No inventory usage data found" });
+    }
+
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching inventory usage report:", error);
+    res.status(500).json({ error: "Failed to fetch inventory usage report" });
+  }
 });
 
 app.listen(PORT, () => {
