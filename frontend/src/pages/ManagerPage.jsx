@@ -60,6 +60,9 @@ const ManagerPage = () => {
           .then((response) => {
             if (response.ok) {
               setIsLoggedIn(true);
+              if (location.pathname === "/manager" || location.pathname === "/manager/") {
+                navigate("/manager/overview", { replace: true });
+              }
             } 
             else {
               localStorage.removeItem("token");
@@ -87,7 +90,7 @@ const ManagerPage = () => {
   }, [location, navigate]);
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-auto min-h-screen">
       <Toaster position="top-center" />
       {isLoggedIn ? (
         <>

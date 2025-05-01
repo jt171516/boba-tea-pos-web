@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from 'react';
+import toast from 'react-hot-toast'; // Import toast
 
-const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, updateSum, updateOrderSummary}) => {
+// Receive addItemToOrderAPI prop, remove updateSum and updateOrderSummary
+const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, addItemToOrderAPI }) => {
     useEffect(() => {
         if (isOpen) {
             //add the no-scroll class to the body when the popup is open
@@ -18,18 +20,20 @@ const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, updateSum, updateOrd
 
     const initialCustomizations = item?.initialCustomizations || {};
 
-    const [selectedSize, setSelectedSize] = useState(initialCustomizations.size || '');
-    const [selectedIce, setSelectedIce] = useState(initialCustomizations.ice || '');
-    const [selectedSugar, setSelectedSugar] = useState(initialCustomizations.sugar || '');
+    // Initialize state with defaults matching voice command defaults
+    const [selectedSize, setSelectedSize] = useState(initialCustomizations.size || 'Large');
+    const [selectedIce, setSelectedIce] = useState(initialCustomizations.ice || '100%');
+    const [selectedSugar, setSelectedSugar] = useState(initialCustomizations.sugar || '100%');
     const [selectedToppings, setSelectedToppings] = useState(initialCustomizations.toppings || []);
 
     useEffect(() => {
         const newCustoms = item?.initialCustomizations || {};
+        // Apply defaults if customization is null/undefined
         setSelectedSize(newCustoms.size || 'Large');
         setSelectedIce(newCustoms.ice || '100%');
         setSelectedSugar(newCustoms.sugar || '100%');
         setSelectedToppings(newCustoms.toppings || []);
-    }, [item]);
+    }, [item]); // Dependency array includes item
 
     if (!isOpen) return null;
 
@@ -130,12 +134,21 @@ const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, updateSum, updateOrd
 
             alert(`Item added successfully to order!`);
 
+        // Call the passed-in API function
+        const success = await addItemToOrderAPI(
+            item, // Pass the whole item object
+            selectedSize,
+            selectedIce,
+            selectedSugar,
+            selectedToppings
+        );
+
+        // Close popup only if adding was successful
+        if (success) {
             onClose();
-        }catch (error) {
-            console.error('Error adding order:', error);
-            alert(`Failed to add order: ${error.message}`);
         }
-}
+        // Feedback (success/error) is handled within addItemToOrderAPI
+    }
 
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -172,7 +185,7 @@ const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, updateSum, updateOrd
                 <div className="mt-6 flex justify-start">
                     <button 
                         className="btn btn-primary px-6 py-2 text-lg font-bold"
-                        onClick={() => handleAddToOrder()}
+                        onClick={handleAddToOrder} // Use the modified handler
                     >
                         Add to Order
                     </button>
@@ -181,18 +194,18 @@ const ItemPopUp = ({ isOpen, onClose, item, currentOrderId, updateSum, updateOrd
                 <div className="flex justify-between mt-4 space-x-8">
                     <div className="sizes">
                         <h3 className="text-lg font-bold mb-2">Size:</h3>
-                        <input className="join-item btn m-1" type="radio" name="size"  value="Small" checked={selectedSize === 'Small'} onChange={(e) => setSelectedSize(e.target.value)} aria-label="Small" />
-                        <input className="join-item btn m-1" type="radio" name="size"  value="Medium" checked={selectedSize === 'Medium'} onChange={(e) => setSelectedSize(e.target.value)} aria-label="Medium" />
-                        <input className="join-item btn m-1" type="radio" name="size"  value="Large" checked={selectedSize === 'Large'} onChange={(e) => setSelectedSize(e.target.value)} aria-label="Large" />
+                        <input className="join-item btn m-1" type="radio" name="size" value="Small" checked={selectedSize === 'Small'} onChange={(e) => setSelectedSize(e.target.value)} aria-label="Small" />
+                        <input className="join-item btn m-1" type="radio" name="size" value="Medium" checked={selectedSize === 'Medium'} onChange={(e) => setSelectedSize(e.target.value)} aria-label="Medium" />
+                        <input className="join-item btn m-1" type="radio" name="size" value="Large" checked={selectedSize === 'Large'} onChange={(e) => setSelectedSize(e.target.value)} aria-label="Large" />
                     </div>
 
                     <div className="ice level">
                         <h3 className="text-lg font-bold mb-2">Ice Level:</h3>
-                        <input className="join-item btn m-1" type="radio" name="ice"  value="0%" checked={selectedIce === '0%'} onChange={(e) => setSelectedIce(e.target.value)} aria-label="0%" />
-                        <input className="join-item btn m-1" type="radio" name="ice"  value="25%" checked={selectedIce === '25%'} onChange={(e) => setSelectedIce(e.target.value)} aria-label="25%" />
-                        <input className="join-item btn m-1" type="radio" name="ice"  value="50%" checked={selectedIce === '50%'} onChange={(e) => setSelectedIce(e.target.value)} aria-label="50%" />
-                        <input className="join-item btn m-1" type="radio" name="ice"  value="75%" checked={selectedIce === '75%'} onChange={(e) => setSelectedIce(e.target.value)} aria-label="75%" />
-                        <input className="join-item btn m-1" type="radio" name="ice"  value="100%" checked={selectedIce === '100%'} onChange={(e) => setSelectedIce(e.target.value)} aria-label="100%" />
+                        <input className="join-item btn m-1" type="radio" name="ice" value="0%" checked={selectedIce === '0%'} onChange={(e) => setSelectedIce(e.target.value)} aria-label="0%" />
+                        <input className="join-item btn m-1" type="radio" name="ice" value="25%" checked={selectedIce === '25%'} onChange={(e) => setSelectedIce(e.target.value)} aria-label="25%" />
+                        <input className="join-item btn m-1" type="radio" name="ice" value="50%" checked={selectedIce === '50%'} onChange={(e) => setSelectedIce(e.target.value)} aria-label="50%" />
+                        <input className="join-item btn m-1" type="radio" name="ice" value="75%" checked={selectedIce === '75%'} onChange={(e) => setSelectedIce(e.target.value)} aria-label="75%" />
+                        <input className="join-item btn m-1" type="radio" name="ice" value="100%" checked={selectedIce === '100%'} onChange={(e) => setSelectedIce(e.target.value)} aria-label="100%" />
                     </div>
 
                     <div className="sugar level"></div>

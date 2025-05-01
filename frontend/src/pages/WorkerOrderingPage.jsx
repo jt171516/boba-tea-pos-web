@@ -151,7 +151,75 @@ function WorkerOrderingPage() {
     };
   }, []); 
 
-  const processFullTranscript = (transcript) => {
+  // Function to handle adding item via API
+  const addItemToOrderAPI = async (itemToAdd, size, ice, sugar, toppings) => {
+    try {
+        if (!size || !ice || !sugar) {
+            toast.error('Please ensure size, ice, and sugar levels are specified.');
+            return false; // Indicate failure
+        }
+        // Preprocess customizations
+        const processedSize = size === 'Small' ? 'S' : size === 'Medium' ? 'M' : 'L';
+        const processedIce = parseInt(ice.replace('%', ''), 10);
+        const processedSugar = parseInt(sugar.replace('%', ''), 10);
+
+        // Fetch item ID (assuming itemToAdd has name property)
+        const itemResponse = await fetch(`${import.meta.env.VITE_APP_API_URL}/item/${itemToAdd.name}`);
+        if (!itemResponse.ok) throw new Error('Failed to fetch item details');
+        const itemData = await itemResponse.json(); // Contains id, price etc.
+
+        // Create entry in ordersitemjunction
+        const orderItemResponse = await fetch(`${import.meta.env.VITE_APP_API_URL}/orderItemId`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                orderId: currentOrderId,
+                itemId: itemData.id,
+                itemName: itemData.name,
+            }),
+        });
+        if (!orderItemResponse.ok) throw new Error('Failed to create order item link');
+        const { orderItemId } = await orderItemResponse.json();
+
+        // Get modifier IDs
+        const modifiersResponse = await fetch(`${import.meta.env.VITE_APP_API_URL}/modifiers`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                size: processedSize,
+                sugar: processedSugar,
+                ice: processedIce,
+                toppings: toppings,
+            }),
+        });
+        if (!modifiersResponse.ok) throw new Error('Failed to fetch modifiers');
+        const modifiersData = await modifiersResponse.json();
+
+        // Link modifiers to the order item
+        await fetch(`${import.meta.env.VITE_APP_API_URL}/ordersitemmodifierjunction`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                orderItemId,
+                modifiers: modifiersData.map(modifier => modifier.id),
+            }),
+        });
+
+        // Update local state
+        updateSum(itemData.price); // Use price from fetched itemData
+        updateOrderSummary(itemData, toppings);
+
+        toast.success(`${itemData.name} added to order!`);
+        return true; // Indicate success
+
+    } catch (error) {
+        console.error('Error adding item to order:', error);
+        toast.error(`Failed to add item: ${error.message}`);
+        return false; // Indicate failure
+    }
+  };
+
+  const processFullTranscript = async (transcript) => { // Make async
       console.log("Processing full transcript:", transcript);
       if (!transcript) {
           toast.error("No command recorded.");
@@ -164,55 +232,116 @@ function WorkerOrderingPage() {
       let requestedIce = null;
       let requestedSugar = null;
       let requestedToppings = [];
+      let addToCartCommand = false; // Flag for add to cart command
 
       if (lowerTranscript.includes("submit order") || lowerTranscript.includes("finish order") || lowerTranscript.includes("checkout")) {
           toast.success("Submitting order...");
           handleSubmitOrder();
-          return; 
+          return;
+      }
+
+      // Check for "add to cart" command
+      if (lowerTranscript.includes("add to cart") || lowerTranscript.includes("add to order")) {
+          addToCartCommand = true;
       }
 
       const sortedItems = [...items].sort((a, b) => b.name.length - a.name.length);
       matchedItem = sortedItems.find(item => lowerTranscript.includes(item.name.toLowerCase()));
 
       if (matchedItem) {
+         // --- Extract Size, Ice, Sugar ---
          if (lowerTranscript.includes("large")) requestedSize = "Large";
          else if (lowerTranscript.includes("medium")) requestedSize = "Medium";
          else if (lowerTranscript.includes("small")) requestedSize = "Small";
+         else requestedSize = "Large"; // Default size
 
-         const iceMatch = lowerTranscript.match(/(?:(\d{1,3})\s*%?\s*ice)|(no ice)|(less ice)|(regular ice)/);
+         // Adjusted ice regex for worker page variations if needed, otherwise keep same as customer
+         const iceMatch = lowerTranscript.match(/(?:(\d{1,3})\s*%?\s*ice)|(no ice)|(less ice)|(half ice)|(light ice)|(normal ice)|(regular ice)/); // Kept same as customer for consistency
          if (iceMatch) {
-           if (iceMatch[1]) { const percent = parseInt(iceMatch[1], 10); if (percent === 0) requestedIce = "0%"; else if (percent <= 25) requestedIce = "25%"; else if (percent <= 50) requestedIce = "50%"; else if (percent <= 75) requestedIce = "75%"; else requestedIce = "100%"; }
+           if (iceMatch[1]) {
+             const percent = parseInt(iceMatch[1], 10);
+             if (percent === 0) requestedIce = "0%";
+             else if (percent <= 25) requestedIce = "25%";
+             else if (percent <= 50) requestedIce = "50%";
+             else if (percent <= 75) requestedIce = "75%";
+             else requestedIce = "100%";
+           }
            else if (iceMatch[2]) { requestedIce = "0%"; }
-           else if (iceMatch[3]) { requestedIce = "50%"; }
-           else if (iceMatch[4]) { requestedIce = "100%"; }
+           else if (iceMatch[3]) { requestedIce = "75%"; } // less ice
+           else if (iceMatch[4]) { requestedIce = "50%"; } // half ice
+           else if (iceMatch[5]) { requestedIce = "25%"; } // light ice
+           else requestedIce = "100%"; // normal/regular/extra
+         } else {
+             requestedIce = "100%"; // Default ice
          }
 
-         const sugarMatch = lowerTranscript.match(/(?:(\d{1,3})\s*%?\s*sugar)|(no sugar)|(half sugar)|(less sugar)|(light sugar)|(normal sugar)|(regular sugar)/);
+         // Adjusted sugar regex for worker page variations if needed
+         const sugarMatch = lowerTranscript.match(/(?:(\d{1,3})\s*%?\s*sugar)|(no sugar)|(less sugar)|(half sugar)|(light sugar)|(regular sugar)|(normal sugar)|(extra sugar)/);
           if (sugarMatch) {
-           if (sugarMatch[1]) { const percent = parseInt(sugarMatch[1], 10); if (percent === 0) requestedSugar = "0%"; else if (percent <= 25) requestedSugar = "25%"; else if (percent <= 50) requestedSugar = "50%"; else if (percent <= 75) requestedSugar = "75%"; else requestedSugar = "100%"; }
+           if (sugarMatch[1]) {
+             const percent = parseInt(sugarMatch[1], 10);
+             if (percent === 0) requestedSugar = "0%";
+             else if (percent <= 25) requestedSugar = "25%";
+             else if (percent <= 50) requestedSugar = "50%";
+             else if (percent <= 75) requestedSugar = "75%";
+             else requestedSugar = "100%";
+           }
            else if (sugarMatch[2]) { requestedSugar = "0%"; }
-           else if (sugarMatch[3]) { requestedSugar = "50%"; }
-           else if (sugarMatch[4]) { requestedSugar = "75%"; }
            else if (sugarMatch[5]) { requestedSugar = "25%"; }
-           else if (sugarMatch[6] || sugarMatch[7]) { requestedSugar = "100%"; }
+           else if (sugarMatch[4]) { requestedSugar = "50%"; }
+           else if (sugarMatch[3]) { requestedSugar = "75%"; }
+           else requestedSugar = "100%"; // regular/normal/extra
+         } else {
+             requestedSugar = "100%"; // Default sugar
          }
 
+         // --- Extract Toppings ---
          const availableToppings = ["boba", "crystal boba", "honey jelly", "lychee jelly", "pudding", "mango popping boba", "creama", "coffee jelly", "ice cream"];
-         availableToppings.forEach(topping => {
-             if (lowerTranscript.includes(topping)) {
-                 const properToppingName = topping.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-                 if (!requestedToppings.includes(properToppingName)) { requestedToppings.push(properToppingName); }
-             }
-         });
+         const sortedToppings = [...availableToppings].sort((a, b) => b.length - a.length);
+         let tempTranscript = lowerTranscript;
 
-        toast.success(`Processing ${matchedItem.name}...`);
-        handleItemClick(matchedItem, {
-            size: requestedSize,
-            ice: requestedIce,
-            sugar: requestedSugar,
-            toppings: requestedToppings
-        });
-      } else {
+         sortedToppings.forEach(topping => {
+             // ... (existing topping extraction logic remains the same) ...
+             const toppingRegex = new RegExp(`\\b${topping}\\b`, 'i');
+             if (topping === "creama") {
+                  const cremaVariations = ["creama", "crema", "cream"];
+                  for (const variation of cremaVariations) {
+                     const variationRegex = new RegExp(`\\b${variation}\\b`, 'i');
+                     if (tempTranscript.match(variationRegex)) {
+                         const properToppingName = "Creama";
+                         if (!requestedToppings.includes(properToppingName)) {
+                             requestedToppings.push(properToppingName);
+                         }
+                         tempTranscript = tempTranscript.replace(variationRegex, '');
+                         break;
+                     }
+                  }
+             } else if (tempTranscript.match(toppingRegex)) {
+                   const properToppingName = topping.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+                   if (!requestedToppings.includes(properToppingName)) {
+                       requestedToppings.push(properToppingName);
+                   }
+                    tempTranscript = tempTranscript.replace(toppingRegex, '');
+               }
+           });
+
+        // --- Decide Action: Add to Cart or Open Popup ---
+        if (addToCartCommand) {
+            toast.success(`Adding ${matchedItem.name} to cart via voice...`);
+            await addItemToOrderAPI(matchedItem, requestedSize, requestedIce, requestedSugar, requestedToppings);
+        } else {
+            toast.success(`Processing ${matchedItem.name}... Opening details.`);
+            handleItemClick(matchedItem, {
+                size: requestedSize,
+                ice: requestedIce,
+                sugar: requestedSugar,
+                toppings: requestedToppings
+            });
+        }
+      } else if (addToCartCommand) {
+          toast.error("Please specify an item to add to the cart.");
+      }
+       else {
         toast.error("Sorry, I couldn't recognize a valid item or command in your request.");
       }
   };
@@ -319,9 +448,9 @@ function WorkerOrderingPage() {
                 className={`btn ${listening ? 'btn-error' : 'btn-info'}`} 
                 disabled={!('webkitSpeechRecognition' in window)} 
             >
-              {listening ? "🛑 Stop Voice" : "🎤 Start Voice"}
-            </button>
-            <button onClick = {() => setIsSummaryOpen(true)} className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition duration-200 relative">
+               {listening ? "🛑 Stop Voice" : "🎤 Start Voice"}
+             </button>
+             <button onClick = {() => setIsSummaryOpen(true)} className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition duration-200 relative">
               <ShoppingCart className = "w-6 h-6 text-gray-500"/>
               {orderSummary.length > 0 && (
                 <span className = "absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
@@ -333,9 +462,9 @@ function WorkerOrderingPage() {
 
           {/* Display filtered drinks using ItemCard */}
           <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 justify-center mx-auto">
-            {filteredItems.map((item) => (
-              <ItemCard key={item.id} item={item} onClick={() => handleItemClick(item)} />
-            ))}
+             {filteredItems.map((item) => (
+               <ItemCard key={item.id} item={item} onClick={() => handleItemClick(item)} />
+             ))}
           </div>
         </div>
       </div>
@@ -348,6 +477,7 @@ function WorkerOrderingPage() {
             currentOrderId = {currentOrderId}
             updateSum = {(itemPrice) => updateSum(itemPrice)}
             updateOrderSummary = {(item, toppings) => updateOrderSummary(item, toppings)}
+            addItemToOrderAPI={addItemToOrderAPI}
           />
         )}
 

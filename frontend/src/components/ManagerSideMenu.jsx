@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Archive, DollarSign, List, Signpost, User } from "lucide-react";
+import { Archive, DollarSign, List, Signpost, User, AppWindow } from "lucide-react";
 
 function ManagerSideMenu() {
 
@@ -38,6 +38,13 @@ function ManagerSideMenu() {
             </Link>
           );
         })}
+        <Link
+          to="/worker"
+          className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-700 transition duration-200 ease-in-out"
+        >
+          <AppWindow/>
+            <span>Cashier Page</span>
+          </Link>
       </nav>
       <div className="mt-auto mx-auto">
         <button onClick={handleLogout} className="btn btn-primary btn-lg gap-2">

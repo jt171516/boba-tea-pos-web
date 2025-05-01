@@ -24,7 +24,7 @@ function SideMenu()
   ];
 
 return (
-    <nav className="bg-gray-900 text-gray-200 h-[calc(100vh-2.5rem)] w-56 p-4 sticky top-10">
+    <nav className="bg-gray-900 text-gray-200 h-[calc(100vh-3.5rem)] w-56 p-4 sticky top-14">
       <h2 className="text-xl font-bold mb-6 border-b border-gray-700 pb-2">
         Drink Categories
       </h2>
