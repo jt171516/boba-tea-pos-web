@@ -29,7 +29,11 @@ export function AccessibilityProvider({ children })
     };
 
     document.addEventListener('click', handleClick);
-    return () => document.removeEventListener('click', handleClick);
+    document.addEventListener('focus', handleClick, true);
+    return () => {
+      document.removeEventListener('click', handleClick);
+      document.removeEventListener('focus', handleClick, true);
+    };
   }, [focusSpeechEnabled]);
 
   return (

@@ -443,6 +443,7 @@ function CustomerPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="border border-gray-300 rounded-lg px-4 py-2 w-full"
+              aria-label="Search" 
             />
             <button
                 onClick={handleVoiceToggle}
@@ -452,7 +453,7 @@ function CustomerPage() {
               {listening ? "🛑 Stop Voice" : "🎤 Start Voice"}
             </button>
             <button onClick = {() => setIsSummaryOpen(true)} className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 transition duration-200 relative">
-              <ShoppingCart className = "w-6 h-6 text-gray-500"/>
+              <ShoppingCart className = "w-6 h-6 text-gray-500" aria-label="Cart"/>
               {orderSummary.length > 0 && (
                 <span className = "absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                   {orderSummary.length}
@@ -464,7 +465,7 @@ function CustomerPage() {
           {/* Display filtered drinks using ItemCard */}
           <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 justify-center mx-auto">
             {filteredItems.map((item) => (
-              <ItemCard key={item.id} item={item} onClick={() => handleItemClick(item)} />
+              <ItemCard key={item.id} item={item} onClick={() => handleItemClick(item) } />
             ))}
           </div>
         </div>
