@@ -3,8 +3,7 @@
 **Course Project:** CSCE 331 – Foundations of Software Engineering (Spring 2025) <br>
 **Developed by:** Michael Ades, Jason Agnew, Casey Ear, Jeremy Tran, and William Xu
 
-**Objective**  
-Deliver a web‑based POS service with distinct views for customers, cashiers, and managers—integrating required APIs and demonstrating agile practices, usability testing, and GitHub‑based configuration management.
+A web‑based POS service with distinct views for customers, cashiers, and managers—integrating required APIs and demonstrating agile practices, usability testing, and GitHub‑based configuration management.
 
 ## Tech Stack
 - **Frontend:** React, Tailwind CSS  
